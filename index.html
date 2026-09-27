@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apel Kos &mdash; Kos Murah Surabaya</title>
+<meta name="description" content="Apel Kos - Kos malei exclusively di Kedurus IV Apel No.37 Surabaya. Fasilitas wifi gratis, dapur umum, kamar mandi dalam, lemari baju.">
+<style>
+  :root{
+    --green:#1f7a4d;
+    --green-dark:#145936;
+    --green-light:#e8f5ee;
+    --red:#e03b2f;
+    --cream:#fdfbf7;
+    --ink:#1c2b24;
+    --muted:#5f7268;
+    --line:#e3e8e4;
+    --radius:16px;
+    --shadow:0 10px 30px rgba(20,89,54,.10);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+    background:var(--cream);color:var(--ink);line-height:1.7;
+  }
+  .wrap{max-width:1140px;margin:0 auto;padding:0 20px;}
+
+  /* ===== HEADER ===== */
+  header{
+    position:sticky;top:0;z-index:60;
+    background:rgba(253,251,247,.92);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:66px;}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;color:var(--green-dark);text-decoration:none;}
+  .logo .mark{
+    width:38px;height:38px;border-radius:12px;flex:0 0 38px;
+    background:linear-gradient(140deg,var(--green),#2fa96a);
+    display:grid;place-items:center;color:#fff;font-size:20px;
+    box-shadow:0 4px 12px rgba(31,122,77,.35);
+  }
+  .nav-links{display:flex;align-items:center;gap:26px;}
+  .nav-links a{color:var(--ink);text-decoration:none;font-size:15px;font-weight:500;}
+  .nav-links a:hover{color:var(--green);}
+  .btn{
+    display:inline-block;padding:11px 20px;border-radius:999px;text-decoration:none;
+    font-weight:600;font-size:15px;border:2px solid transparent;cursor:pointer;transition:.2s;
+  }
+  .btn-primary{background:var(--green);color:#fff;box-shadow:0 6px 16px rgba(31,122,77,.28);}
+  .btn-primary:hover{background:var(--green-dark);transform:translateY(-2px);}
+  .btn-wa{background:var(--red);color:#fff;box-shadow:0 6px 16px rgba(224,59,47,.3);}
+  .btn-wa:hover{background:#c22c22;transform:translateY(-2px);}
+  .burger{display:none;font-size:26px;background:none;border:0;cursor:pointer;color:var(--green-dark);}
+
+  /* ===== HERO ===== */
+  .hero{padding:54px 0 30px;}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center;}
+  .tag{
+    display:inline-block;background:var(--green-light);color:var(--green-dark);
+    padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600;margin-bottom:16px;
+  }
+  h1{font-size:40px;line-height:1.2;letter-spacing:-.5px;margin-bottom:14px;}
+  h1 span{color:var(--green);}
+  .lead{color:var(--muted);font-size:17px;margin-bottom:22px;}
+  .hero-cta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:26px;}
+  .hero-facts{display:flex;gap:22px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:20px;}
+  .fact b{display:block;font-size:20px;color:var(--green-dark);}
+  .fact span{font-size:13px;color:var(--muted);}
+
+  /* ===== SLIDER ===== */
+  .slider{
+    position:relative;border-radius:22px;overflow:hidden;background:#e9ecea;
+    box-shadow:var(--shadow);border:1px solid var(--line);
+  }
+  .slides{display:flex;transition:transform .5s ease;}
+  .slide{flex:0 0 100%;}
+  .slide img,.slide .ph{
+    width:100%;height:360px;object-fit:cover;display:block;
+  }
+  .slide .ph{
+    display:grid;place-items:center;text-align:center;padding:24px;
+    background:
+      repeating-linear-gradient(45deg,#eef1ef 0 14px,#e7ebe8 14px 28px);
+    color:var(--muted);
+  }
+  .ph .ico{font-size:40px;display:block;margin-bottom:10px;opacity:.5;}
+  .ph strong{display:block;font-size:16px;margin-bottom:4px;color:var(--green-dark);}
+  .ph small{font-size:13px;}
+  .s-arrow{
+    position:absolute;top:50%;transform:translateY(-50%);
+    width:42px;height:42px;border-radius:50%;border:0;cursor:pointer;
+    background:rgba(255,255,255,.92);color:var(--green-dark);font-size:20px;
+    display:grid;place-items:center;box-shadow:0 3px 10px rgba(0,0,0,.18);transition:.2s;
+  }
+  .s-arrow:hover{background:#fff;transform:translateY(-50%) scale(1.08);}
+  .s-prev{left:12px;} .s-next{right:12px;}
+  .dots{position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:8px;}
+  .dots button{
+    width:9px;height:9px;padding:0;border-radius:50%;border:0;cursor:pointer;
+    background:rgba(255,255,255,.65);transition:.25s;
+  }
+  .dots button.on{background:#fff;width:26px;border-radius:999px;}
+
+  /* ===== SECTION ===== */
+  section{padding:64px 0;}
+  .sec-head{text-align:center;max-width:660px;margin:0 auto 38px;}
+  .sec-head h2{font-size:32px;letter-spacing:-.5px;margin-bottom:10px;}
+  .sec-head p{color:var(--muted);}
+  .line-deco{width:56px;height:4px;border-radius:999px;background:var(--red);margin:0 auto 14px;}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;}
+  .card{
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    padding:26px 22px;transition:.25s;
+  }
+  .card:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:#cfe3d7;}
+  .card .ico{
+    width:50px;height:50px;border-radius:14px;background:var(--green-light);
+    display:grid;place-items:center;font-size:24px;margin-bottom:14px;
+  }
+  .card h3{font-size:18px;margin-bottom:6px;}
+  .card p{color:var(--muted);font-size:14.5px;}
+
+  .rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;}
+  .room{
+    display:flex;align-items:center;gap:14px;background:#fff;
+    border:1px solid var(--line);border-left:5px solid var(--green);
+    border-radius:12px;padding:16px 18px;font-weight:600;font-size:15px;
+  }
+  .room span{font-size:24px;}
+  .room small{display:block;font-weight:400;color:var(--muted);font-size:13px;}
+
+  /* ===== MAP ===== */
+  .map-wrap{
+    border-radius:20px;overflow:hidden;border:1px solid var(--line);
+    box-shadow:var(--shadow);background:#e9ecea;
+  }
+  .map-wrap iframe{width:100%;height:420px;border:0;display:block;}
+  .addr{
+    display:flex;gap:14px;align-items:flex-start;background:#fff;
+    border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin-top:18px;
+  }
+  .addr .ico{font-size:26px;}
+  .addr b{display:block;}
+  .addr p{color:var(--muted);font-size:14.5px;}
+
+  /* ===== CTA ===== */
+  .cta{
+    background:linear-gradient(135deg,var(--green-dark),var(--green));
+    color:#fff;border-radius:24px;padding:44px 34px;text-align:center;margin-bottom:70px;
+  }
+  .cta h2{font-size:30px;margin-bottom:10px;}
+  .cta p{opacity:.9;margin-bottom:22px;}
+  .cta .btn-wa{background:#fff;color:var(--green-dark);box-shadow:0 8px 20px rgba(0,0,0,.18);}
+
+  footer{
+    background:#0f2a1e;color:#b9cec2;padding:26px 0;text-align:center;font-size:14px;
+  }
+  footer b{color:#fff;}
+
+  /* ===== FLOATING WA ===== */
+  .wa-float{
+    position:fixed;right:22px;bottom:22px;z-index:100;
+    display:flex;align-items:center;gap:10px;
+    background:#25d366;color:#fff;text-decoration:none;
+    padding:14px 20px;border-radius:999px;font-weight:700;font-size:15px;
+    box-shadow:0 10px 26px rgba(37,211,102,.45);
+    transition:.25s;
+  }
+  .wa-float:hover{transform:translateY(-3px) scale(1.03);background:#1eb457;}
+  .wa-float svg{width:24px;height:24px;fill:#fff;}
+  .wa-float .txt{white-space:nowrap;}
+  .wa-float .pulse{
+    position:absolute;inset:0;border-radius:999px;border:2px solid #25d366;
+    animation:pulse 2s infinite;pointer-events:none;
+  }
+  @keyframes pulse{
+    0%{transform:scale(1);opacity:.7}
+    100%{transform:scale(1.35);opacity:0}
+  }
+  .wa-float.mini{padding:15px;border-radius:50%;}
+  .wa-float.mini .txt{display:none;}
+
+  /* ===== RESPONSIVE ===== */
+  @media(max-width:880px){
+    .hero{padding-top:32px;}
+    .hero-grid{grid-template-columns:1fr;gap:28px;}
+    h1{font-size:31px;}
+    h2,.sec-head h2{font-size:25px;}
+    .slide img,.slide .ph{height:250px;}
+    .nav-links{
+      position:absolute;top:66px;left:0;right:0;background:#fff;flex-direction:column;
+      align-items:stretch;gap:0;padding:8px 20px 16px;border-bottom:1px solid var(--line);display:none;
+    }
+    .nav-links.open{display:flex;}
+    .nav-links a{padding:11px 0;}
+    .burger{display:block;}
+    .nav .btn{display:none;}
+  }
+  @media(max-width:520px){
+    .wa-float .txt{display:none;}
+    .wa-float{padding:16px;right:16px;bottom:16px;}
+    section{padding:48px 0;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ======================= HEADER ======================= -->
+<header>
+  <div class="wrap nav">
+    <a href="#" class="logo"><span class="mark">🍎</span> Apel Kos</a>
+    <button class="burger" id="burger" aria-label="Menu">☰</button>
+    <nav class="nav-links" id="menu">
+      <a href="#fasilitas">Fasilitas</a>
+      <a href="#kamar">Isi Kamar</a>
+      <a href="#lokasi">Lokasi</a>
+      <a href="#" class="btn btn-primary" data-wa>Hubungi Admin</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ======================= HERO + SLIDER ======================= -->
+<div class="wrap hero">
+  <div class="hero-grid">
+    <div>
+      <span class="tag">🏠 Kos Pri &amp; Putri &mdash; Surabaya</span>
+      <h1>Kos Nyaman <span>Apel Kos</span> di Kedurus IV</h1>
+      <p class="lead">
+        Kos terjangkau dengan suasana homey, letak strategis, serta fasilitas yang lengkap.
+        Dekat kampus, kantor, serta akses transportasi publik yang gampang.
+      </p>
+      <div class="hero-cta">
+        <a href="#" class="btn btn-wa" data-wa>Chat Admin via WhatsApp</a>
+        <a href="#lokasi" class="btn" style="border-color:var(--green);color:var(--green-dark)">Lihat Lokasi</a>
+      </div>
+      <div class="hero-facts">
+        <div class="fact"><b>100%</b><span>Wifi Gratis</span></div>
+        <div class="fact"><b>1</b><span>Spring Bed / kamar</span></div>
+        <div class="fact"><b>Dalam</b><span>Kamar mandi</span></div>
+        <div class="fact"><b>24 Jam</b><span>Air &amp; listrik</span></div>
+      </div>
+    </div>
+
+    <!-- ===== SLIDER: GANTI FOTO DI SINI ===== -->
+    <!--
+      CARA MENGISI FOTO:
+      1. Buat folder "images" di sebelah file index.html
+      2. Simpan foto Anda sebagai images/1.jpg, images/2.jpg, images/3.jpg, images/4.jpg
+      3. Ganti isi <span class="ph">...</span> di bawah dengan:
+         <img src="images/1.jpg" alt="Kamar Apel Kos">
+      (Ulangi untuk slide berikutnya)
+    -->
+    <div class="slider" id="slider">
+      <div class="slides" id="slides">
+
+        <div class="slide">
+          <!-- <img src="images/1.jpg" alt="Kamar Apel Kos 1"> -->
+          <div class="ph"><div><span class="ico">🖼️</span><strong>Foto 1</strong><small>Ganti dengan &lt;img src="images/1.jpg"&gt;</small></div></div>
+        </div>
+
+        <div class="slide">
+          <!-- <img src="images/2.jpg" alt="Kamar Apel Kos 2"> -->
+          <div class="ph"><div><span class="ico">🖼️</span><strong>Foto 2</strong><small>Ganti dengan &lt;img src="images/2.jpg"&gt;</small></div></div>
+        </div>
+
+        <div class="slide">
+          <!-- <img src="images/3.jpg" alt="Kamar Apel Kos 3"> -->
+          <div class="ph"><div><span class="ico">🖼️</span><strong>Foto 3</strong><small>Ganti dengan &lt;img src="images/3.jpg"&gt;</small></div></div>
+        </div>
+
+        <div class="slide">
+          <!-- <img src="images/4.jpg" alt="Kamar Apel Kos 4"> -->
+          <div class="ph"><div><span class="ico">🖼️</span><strong>Foto 4</strong><small>Ganti dengan &lt;img src="images/4.jpg"&gt;</small></div></div>
+        </div>
+
+      </div>
+      <button class="s-arrow s-prev" id="prev" aria-label="Sebelumnya">‹</button>
+      <button class="s-arrow s-next" id="next" aria-label="Berikutnya">›</button>
+      <div class="dots" id="dots"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= FASILITAS ======================= -->
+<section id="fasilitas">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="line-deco"></div>
+      <h2>Fasilitas Apel Kos</h2>
+      <p>Semua yang Anda butuhkan untuk tinggal nyaman, sudah kami siapkan.</p>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="ico">📶</div>
+        <h3>Wifi Gratis</h3>
+        <p>Internet wifi gratis berkecepatan tinggi untuk belajar, kerja, dan menonton.</p>
+      </div>
+      <div class="card">
+        <div class="ico">🍳</div>
+        <h3>Dapur Umum</h3>
+        <p>Dapur bersama lengkap dengan kompor, kulkas, dan area makan yang luas.</p>
+      </div>
+      <div class="card">
+        <div class="ico">🛏️</div>
+        <h3>1 Spring Bed</h3>
+        <p>Setiap kamar tidur dilengkapi 1 spring bed yang nyaman dan bergaya modern.</p>
+      </div>
+      <div class="card">
+        <div class="ico">🚿</div>
+        <h3>Kamar Mandi Dalam</h3>
+        <p>1 kamar mandi private di dalam kamar, jadi lebih privasi dan praktis.</p>
+      </div>
+      <div class="card">
+        <div class="ico">🚪</div>
+        <h3>1 Lemari Baju</h3>
+        <p>Lemari penyimpanan pakaian di dalam kamar, cukup untuk kebutuhan harian.</p>
+      </div>
+      <div class="card">
+        <div class="ico">🧺</div>
+        <h3>Ruang Umum</h3>
+        <p>Tempat santai, area jaga motor, dan lingkungan aman dengan CCTV 24 jam.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= ISI KAMAR ======================= -->
+<section id="kamar" style="background:var(--green-light)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="line-deco"></div>
+      <h2>Isi Setiap Kamar</h2>
+      <p>Standar kamar yang kami berikan untuk setiap penghuni Apel Kos.</p>
+    </div>
+
+    <div class="rooms">
+      <div class="room"><span>🛏️</span><div>1 Spring Bed<small>Kasur nyaman dan bergaya modern</small></div></div>
+      <div class="room"><span>🚿</span><div>1 Kamar Mandi<small>Private di dalam kamar</small></div></div>
+      <div class="room"><span>🚪</span><div>1 Lemari Baju<small>Penyimpanan pakaian</small></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= LOKASI ======================= -->
+<section id="lokasi">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="line-deco"></div>
+      <h2>Lokasi Apel Kos</h2>
+      <p>Kedurus IV Apel No.37, Surabaya &mdash; mudah dijangkau dari segala arah.</p>
+    </div>
+
+    <div class="map-wrap">
+      <iframe
+        title="Lokasi Apel Kos"
+        src="https://www.google.com/maps?q=Kedurus%20IV%20Apel%20No.37%20Surabaya&output=embed"
+        allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+
+    <div class="addr">
+      <span class="ico">📍</span>
+      <div>
+        <b>Apel Kos</b>
+        <p>Jl. Kedurus IV Apel No.37, Surabaya, Jawa Timur &mdash; dekat dengan Ajinomoto, supermarket, dan akses transportasi publik</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= CTA ======================= -->
+<div class="wrap">
+  <div class="cta">
+    <h2>Minat Sewa Apel Kos?</h2>
+    <p>Chat admin sekarang untuk cek ketersediaan kamar &amp; harga sewanya.</p>
+    <a href="#" class="btn btn-wa" data-wa>Hubungi Admin Sekarang</a>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <b>🍎 Apel Kos</b> &mdash; Kedurus IV Apel No.37, Surabaya<br>
+    © <span id="year"></span> Apel Kos. All rights reserved.
+  </div>
+</footer>
+
+<!-- ======================= FLOATING WHATSAPP ======================= -->
+<!-- GANTI NOMOR DI BAWAH (format 62xxx, tanpa tanda +) -->
+<a class="wa-float" id="waFloat" target="_blank" rel="noopener" href="#">
+  <span class="pulse"></span>
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.174.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884a9.82 9.82 0 016.988 2.896 9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.886-9.885 9.886m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.488"/></svg>
+  <span class="txt">Hubungi Admin</span>
+</a>
+
+<script>
+/* =========================================================
+   KONFIGURASI — UBAH NOMOR WHATSAPP DI SINI
+   Format internasional tanpa "+" / spasi, contoh: 6281234567890
+   ========================================================= */
+var WA_NUMBER = "6281234567890";
+var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih ada kamar kosong?";
+
+(function(){
+  // Link WhatsApp untuk semua elemen ber-atribut data-wa + tombol floating
+  var link = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(WA_MESSAGE);
+  document.querySelectorAll("[data-wa]").forEach(function(el){ el.href = link; });
+  document.getElementById("waFloat").href = link;
+
+  // Tahun footer
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  // Menu mobile
+  var burger = document.getElementById("burger"), menu = document.getElementById("menu");
+  burger.addEventListener("click", function(){ menu.classList.toggle("open"); });
+  menu.addEventListener("click", function(e){
+    if(e.target.tagName === "A") menu.classList.remove("open");
+  });
+
+  // ===== SLIDER =====
+  var slides = document.getElementById("slides");
+  var total  = slides.children.length;
+  var idx = 0, timer = null;
+  var dots = document.getElementById("dots");
+
+  for(var i=0;i<total;i++){
+    (function(n){
+      var b = document.createElement("button");
+      b.setAttribute("aria-label","Slide " + (n+1));
+      b.addEventListener("click", function(){ go(n); reset(); });
+      dots.appendChild(b);
+    })(i);
+  }
+
+  function go(n){
+    idx = (n + total) % total;
+    slides.style.transform = "translateX(-" + (idx * 100) + "%)";
+    Array.prototype.forEach.call(dots.children, function(d,k){
+      d.className = (k === idx ? "on" : "");
+    });
+  }
+  function next(){ go(idx + 1); }
+  function prev(){ go(idx - 1); }
+  function reset(){ clearInterval(timer); timer = setInterval(next, 4500); }
+
+  document.getElementById("next").addEventListener("click", function(){ next(); reset(); });
+  document.getElementById("prev").addEventListener("click", function(){ prev(); reset(); });
+
+  // swipe / geser
+  var x0 = null;
+  document.getElementById("slider").addEventListener("touchstart", function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+  document.getElementById("slider").addEventListener("touchend", function(e){
+    if(x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if(Math.abs(dx) > 45){ dx < 0 ? next() : prev(); reset(); }
+    x0 = null;
+  });
+
+  go(0); reset();
+})();
+</script>
+</body>
+</html>
