@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://apelkos.com/sitemap.xml
