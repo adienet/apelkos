@@ -373,6 +373,22 @@
   }
   .pano-ctl button:hover{background:var(--green);color:#fff;border-color:var(--green);}
 
+  /* pemilih foto 360 */
+  .pano-list{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin-bottom:16px;}
+  .pano-list button{
+    padding:8px 16px;border-radius:999px;border:2px solid var(--line);background:#fff;
+    color:var(--muted);font-weight:600;font-size:14px;cursor:pointer;transition:.2s;
+  }
+  .pano-list button.on{background:var(--green);border-color:var(--green);color:#fff;}
+  .pano video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;}
+  .pano .err{
+    position:absolute;inset:0;display:none;place-items:center;text-align:center;padding:24px;
+    background:#fdecea;color:#8a2318;
+  }
+  .pano .err.on{display:grid;}
+  .pano .err b{display:block;margin-bottom:6px;font-size:16px;}
+  .pano .err small{display:block;font-size:13px;max-width:520px;line-height:1.6;}
+
   /* grid foto biasa + lightbox */
   .gal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;}
   .gal-item{
@@ -729,29 +745,47 @@
       <button class="tab" data-pane="pflat">Foto Biasa</button>
     </div>
 
-    <!-- ===== PANO 360 DERAJAT =====
-         CARA ISI:
-         1. Foto WAJIB panorama equirectangular (rasio lebar:tinggi = 2:1),
-            contoh diambil dari kamera 360 atau Google Street View.
-         2. Simpan ke folder images/360/ dengan nama 1.jpg
-         3. Uncomment baris <img class="strip" ...> di bawah
-         4. Hapus blok <div class="empty">...</div> supaya placeholder hilang
-         5. Kalau ingin zoom lebih dekat, naikkan nilai ZOOM di JavaScript. -->
-    <div class="pane on" id="p360">
+    <!-- ===== FOTO 360 DERAJAT =====
+         CARA ISI (support file Insta360 .insp):
+         1. Simpan file 360 ke folder images/360/
+            - .insp  = file foto 360 asli dari kamera Insta360
+            - .jpg   = panorama 2:1 (hasil export dari Insta360 Studio)
+            - .mp4   = video 360 (hasil export dari Insta360 Studio)
+         2. Buka bagian JavaScript di bawah, cari "var PANO_360"
+         3. Isi daftarnya, contoh:
+              var PANO_360 = [
+                { src: "images/360/1.insp", label: "Kamar 1", type: "insp" },
+                { src: "images/360/2.jpg",  label: "Dapur" }
+              ];
+         4. Kalau foto 360 tidak bisa dibuka, salin/rename file .insp
+            menjadi .jpg (isinya sama persis) lalu pakai nama .jpg.
+
+         CATATAN PENTING:
+         - File .insp itu sebenarnya JPEG dengan rasio 2:1, jadi bisa
+           langsung dipakai sebagai panorama.
+         - .insp HARUS dalam mode equirectangular. Kalau di kamera Anda
+           tersimpan dual-fisheye, gambar akan terlihat melengkung.
+           Buka di Insta360 Studio lalu export ulang ke JPG 2:1.
+         - Kalau gambar melengkung (lingkaran), itu dual-fisheye,
+           bukan equirectangular. -->    <div class="pane on" id="p360">
+      <!-- Daftar foto 360 diatur di JavaScript: cari var PANO_360 (bagian bawah file) -->
+      <div class="pano-list" id="panoList" hidden></div>
+
       <div class="pano" id="pano">
-        <!-- GANTI: <img class="strip" src="images/360/1.jpg" alt="Foto 360 kamar Apel Kos">
-             Hapus blok <div class="empty">...</div> di bawah setelah foto diisi.
-             Syarat: foto HARUS panorama equirectangular (rasio 2:1, lebar 2x tinggi). -->
-        <div class="empty">
-          <div><span>🗜</span><b>Foto 360&deg; Derajat</b><small>Belum diisi &mdash; taruh foto panorama di <code>images/360/1.jpg</code> (rasio 2:1)</small></div>
+        <div class="empty" id="panoEmpty">
+          <div><span>🗜</span><b>Foto 360&deg; Derajat</b>
+          <small>Belum diisi. Taruh file di <code>images/360/</code>, lalu daftarkan di <code>var PANO_360</code>.</small></div>
         </div>
-        <span class="badge">360&deg;</span>
-        <span class="hint">Geser kiri / kanan atau swipe untuk memutar</span>
+        <span class="badge" id="panoBadge">360&deg;</span>
+        <span class="hint" id="panoHint">Geser kiri / kanan atau swipe untuk memutar</span>
       </div>
-      <div class="pano-ctl">
-        <button type="button" id="pLeft" aria-label="Putar kiri">&#8249;</button>
-        <button type="button" id="pReset" aria-label="Reset" style="font-size:15px;font-weight:700">Reset</button>
-        <button type="button" id="pRight" aria-label="Putar kanan">&#8250;</button>
+
+      <div class="pano-ctl" id="panoCtl">
+        <button type="button" id="pPrev" aria-label="Foto sebelumnya">&#8249;</button>
+        <button type="button" id="pLeft" aria-label="Putar kiri">&#8592;</button>
+        <button type="button" id="pReset" aria-label="Reset">Reset</button>
+        <button type="button" id="pRight" aria-label="Putar kanan">&#8594;</button>
+        <button type="button" id="pNext" aria-label="Foto berikutnya">&#8250;</button>
       </div>
     </div>
 
@@ -926,16 +960,51 @@ var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih
     });
   });
 
-  // ===== PANORAMA 360 (drag / swipe) =====
-  var pano  = document.getElementById("pano");
-  var strip = pano.querySelector("img.strip");
-  var pan = 0, dragging = false, sx = 0, sp = 0;
+  // ===== FOTO 360 DERAJAT (support .insp Insta360) =====
+  // Daftar foto 360. Ganti isi array ini sesuai file Anda.
+  // Format src:
+  //   .insp / .jpg / .jpeg / .png  -> foto panorama (rasio 2:1)
+  //   .mp4  / .webm                -> video 360 (rasio 2:1)
+  // type "insp" opsional, hanya untuk menandai file Insta360.
+  var PANO_360 = [
+    // { src: "images/360/1.insp", label: "Kamar 1",   type: "insp" },
+    // { src: "images/360/2.jpg",  label: "Kamar 2" },
+    // { src: "images/360/3.mp4",  label: "Tur 360" }
+  ];
 
   // ZOOM: 1 = panorama pas-lebar (tidak bisa berputar).
   // 2 = lebar gambar 2x viewport, jadi 1 layar drag = sekitar 180 derajat.
   // Naikkan ke 3 atau 4 kalau ingin zoom lebih dekat.
   var ZOOM = 2;
 
+  var pano   = document.getElementById("pano");
+  var listEl = document.getElementById("panoList");
+  var emptyEl= document.getElementById("panoEmpty");
+  var badgeEl= document.getElementById("panoBadge");
+  var hintEl = document.getElementById("panoHint");
+  var ctlEl  = document.getElementById("panoCtl");
+  var strip = null, video = null, errBox = null;
+  var pan = 0, dragging = false, sx = 0, sp = 0, cur = -1;
+
+  var IMG_RE  = /\.(insp|jpe?g|png|webp)(\?|#|$)/i;
+  var VID_RE  = /\.(mp4|webm|mov)(\?|#|$)/i;
+
+  function kind(item){
+    if(item.type === "insp") return "insp";
+    if(VID_RE.test(item.src))   return "video";
+    if(IMG_RE.test(item.src))   return "image";
+    return "image";
+  }
+
+  function clampPx(v){
+    return Math.max(0, Math.min(maxPan(), v));
+  }
+  function maxPan(){
+    return strip ? Math.max(0, strip.offsetWidth - pano.clientWidth) : 0;
+  }
+  function paint(){
+    if(strip) strip.style.transform = "translateX(" + (-pan) + "px) translateY(-50%)";
+  }
   function fit(){
     if(!strip || !strip.naturalWidth) return;
     var nw = strip.naturalWidth, nh = strip.naturalHeight;
@@ -945,41 +1014,111 @@ var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih
     pan = clampPx(pan);
     paint();
   }
-  function maxPan(){
-    return strip ? Math.max(0, strip.offsetWidth - pano.clientWidth) : 0;
-  }
-  function clampPx(v){ return Math.max(0, Math.min(maxPan(), v)); }
-  function paint(){
-    if(strip) strip.style.transform = "translateX(" + (-pan) + "px) translateY(-50%)";
-  }
   function nudge(d){ pan = clampPx(pan + d); paint(); }
-  function reset(){ pan = 0; paint(); }
+  function resetPan(){ pan = 0; paint(); }
 
   function down(x){ dragging = true; sx = x; sp = pan; pano.classList.add("drag"); }
   function move(x){
-    if(!dragging) return;
+    if(!dragging || !strip) return;
     pan = clampPx(sp - (x - sx));   // geser kanan -> lihat sisi kiri foto
     paint();
   }
   function up(){ dragging = false; pano.classList.remove("drag"); }
 
-  if(strip){
-    strip.setAttribute("draggable", "false");
-    strip.addEventListener("load", function(){ fit(); reset(); });
-    window.addEventListener("resize", fit);
-    if(strip.complete && strip.naturalWidth) fit();
+  function clearStage(){
+    if(strip){ strip.remove(); strip = null; }
+    if(video){ video.remove(); video = null; }
+    if(errBox){ errBox.remove(); errBox = null; }
+    pan = 0;
   }
 
-  pano.addEventListener("mousedown", function(e){ if(!strip) return; down(e.clientX); e.preventDefault(); });
+  function showError(item, why){
+    clearStage();
+    errBox = document.createElement("div");
+    errBox.className = "err on";
+    var hintMsg = kind(item) === "insp"
+      ? "File .insp gagal dibuka. Penyebab paling umum: server tidak mengirim tipe MIME image/jpeg untuk ekstensi .insp. Solusi paling mudah: salin/rename file .insp menjadi .jpg (isi file tidak berubah sama sekali), lalu pakai nama .jpg di PANO_360."
+      : "Gagal memuat file. Pastikan file ada di folder images/360/ dan nama huruf besarnya sama persis.";
+    errBox.innerHTML =
+      '<div><b>Tidak bisa membuka ' + (item.src.split("/").pop()) + '</b>' +
+      '<small>' + why + ' ' + hintMsg + '</small></div>';
+    pano.appendChild(errBox);
+    badgeEl.textContent = "Error";
+    hintEl.style.display = "none";
+    ctlEl.style.display = "none";
+  }
+
+  function load(i){
+    if(!PANO_360.length) return;
+    cur = (i + PANO_360.length) % PANO_360.length;
+    var item = PANO_360[cur];
+    var k = kind(item);
+
+    clearStage();
+    emptyEl.style.display = "none";
+    badgeEl.textContent = k === "insp" ? "360&deg; INSP" : "360&deg;";
+    hintEl.style.display = "";
+    ctlEl.style.display = PANO_360.length > 1 ? "" : "none";
+
+    // aktifkan tombol Navigasi foto
+    [].forEach.call(listEl.children, function(b, idx){
+      b.classList.toggle("on", idx === cur);
+    });
+
+    if(k === "video"){
+      badgeEl.textContent = "Video 360";
+      hintEl.textContent = "Putar video. Tampilan datar, bukan panorama 360 penuh.";
+      video = document.createElement("video");
+      video.src = item.src;
+      video.controls = true;
+      video.playsInline = true;
+      video.setAttribute("playsinline", "");
+      video.addEventListener("error", function(){ showError(item, "Browser gagal memutar video ini."); });
+      pano.appendChild(video);
+      return;
+    }
+
+    strip = document.createElement("img");
+    strip.className = "strip";
+    strip.alt = item.label || "Foto 360 Apel Kos";
+    strip.setAttribute("draggable", "false");
+    strip.addEventListener("load", function(){ fit(); resetPan(); });
+    strip.addEventListener("error", function(){ showError(item, ""); });
+    strip.src = item.src;
+    pano.appendChild(strip);
+  }
+
+  // Bangun tombol pemilih bila ada daftar
+  if(PANO_360.length){
+    emptyEl.style.display = "none";
+    listEl.hidden = false;
+    PANO_360.forEach(function(item, i){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = item.label || ("360 " + (i + 1));
+      b.addEventListener("click", function(){ load(i); });
+      listEl.appendChild(b);
+    });
+    load(0);
+  } else {
+    ctlEl.style.display = "none";
+  }
+
+  pano.addEventListener("mousedown", function(e){ if(strip) down(e.clientX); e.preventDefault(); });
   window.addEventListener("mousemove", function(e){ move(e.clientX); });
   window.addEventListener("mouseup", up);
   pano.addEventListener("touchstart", function(e){ if(strip) down(e.touches[0].clientX); }, {passive:true});
   pano.addEventListener("touchmove",  function(e){ if(strip) move(e.touches[0].clientX); }, {passive:true});
   pano.addEventListener("touchend",   up);
+  window.addEventListener("resize", function(){
+    if(strip) fit();
+  });
 
   document.getElementById("pLeft").addEventListener("click",  function(){ nudge(-pano.clientWidth * 0.25); });
   document.getElementById("pRight").addEventListener("click", function(){ nudge( pano.clientWidth * 0.25); });
-  document.getElementById("pReset").addEventListener("click", reset);
+  document.getElementById("pReset").addEventListener("click", resetPan);
+  document.getElementById("pPrev").addEventListener("click",  function(){ if(PANO_360.length > 1) load(cur - 1); });
+  document.getElementById("pNext").addEventListener("click",  function(){ if(PANO_360.length > 1) load(cur + 1); });
 
   document.addEventListener("keydown", function(e){
     if(document.getElementById("lb").classList.contains("on")){
