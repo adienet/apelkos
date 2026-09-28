@@ -381,6 +381,7 @@
   }
   .pano-list button.on{background:var(--green);border-color:var(--green);color:#fff;}
   .pano video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;}
+  .pano iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff;}
   .pano .err{
     position:absolute;inset:0;display:none;place-items:center;text-align:center;padding:24px;
     background:#fdecea;color:#8a2318;
@@ -967,9 +968,18 @@ var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih
   //   .mp4  / .webm                -> video 360 (rasio 2:1)
   // type "insp" opsional, hanya untuk menandai file Insta360.
   var PANO_360 = [
-    // { src: "images/360/1.insp", label: "Kamar 1",   type: "insp" },
+    // A. Foto panorama sendiri (self-hosted, tanpa watermark)
+    // { src: "images/360/1.insp", label: "Kamar 1", type: "insp" },
     // { src: "images/360/2.jpg",  label: "Kamar 2" },
-    // { src: "images/360/3.mp4",  label: "Tur 360" }
+
+    // B. Panoee.live / penyedia hosting lain -> viewer WebGL asli (iframe).
+    //    Ambil kode embed dari tombol Share di studio.panoee.com,
+    //    lalu tempel URL iframe-nya di sini.
+    // { src: "https://panoee.live/360/panorama-1790567174870",
+    //   label: "Kamar 360", type: "iframe" },
+
+    // C. Video 360 (rasio 2:1, hasil export Insta360 Studio)
+    // { src: "images/360/3.mp4", label: "Tur 360" }
   ];
 
   // ZOOM: 1 = panorama pas-lebar (tidak bisa berputar).
@@ -983,16 +993,24 @@ var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih
   var badgeEl= document.getElementById("panoBadge");
   var hintEl = document.getElementById("panoHint");
   var ctlEl  = document.getElementById("panoCtl");
-  var strip = null, video = null, errBox = null;
+  var strip = null, video = null, frame = null, errBox = null;
   var pan = 0, dragging = false, sx = 0, sp = 0, cur = -1;
 
   var IMG_RE  = /\.(insp|jpe?g|png|webp)(\?|#|$)/i;
   var VID_RE  = /\.(mp4|webm|mov)(\?|#|$)/i;
+  var IFRAME_RE = /^(https?:)?\/\//i;
 
   function kind(item){
+    // Mutlakkan src supaya URL absolut/relatif sama-sama bisa dicek.
+    var u = (item.src || "").trim();
+    var hasExt = IMG_RE.test(u) || VID_RE.test(u);
+    // iframe hanya kalau diminta eksplisit, atau URL absolut yang
+    // BUKAN file gambar/video (mis. https://panoee.live/360/panorama-123)
+    if(item.type === "iframe") return "iframe";
+    if(IFRAME_RE.test(u) && !hasExt) return "iframe";
     if(item.type === "insp") return "insp";
-    if(VID_RE.test(item.src))   return "video";
-    if(IMG_RE.test(item.src))   return "image";
+    if(VID_RE.test(u))  return "video";
+    if(IMG_RE.test(u))  return "image";
     return "image";
   }
 
@@ -1028,6 +1046,7 @@ var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih
   function clearStage(){
     if(strip){ strip.remove(); strip = null; }
     if(video){ video.remove(); video = null; }
+    if(frame){ frame.remove(); frame = null; }
     if(errBox){ errBox.remove(); errBox = null; }
     pan = 0;
   }
@@ -1064,6 +1083,21 @@ var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih
     [].forEach.call(listEl.children, function(b, idx){
       b.classList.toggle("on", idx === cur);
     });
+
+    if(k === "iframe"){
+      badgeEl.textContent = "360&deg; Hosted";
+      hintEl.textContent = "Viewer 360 dari penyedia hosting (iframe).";
+      frame = document.createElement("iframe");
+      frame.src = item.src;
+      frame.title = item.label || "Foto 360 Apel Kos";
+      frame.setAttribute("allow", "accelerometer; gyroscope; fullscreen; xr-spatial-tracking");
+      frame.setAttribute("allowfullscreen", "");
+      frame.setAttribute("loading", "lazy");
+      frame.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
+      pano.appendChild(frame);
+      ctlEl.style.display = "none";   // iframe punya kontrol sendiri
+      return;
+    }
 
     if(k === "video"){
       badgeEl.textContent = "Video 360";
