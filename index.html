@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kos Putri Surabaya Barat | Apel Kos - Jl. Kedurus IV Apel No.37</title>
-<meta name="description" content="Apel Kos: kos putri Surabaya Barat di Jl. Kedurus IV Apel No.37. Wifi gratis, dapur umum, 1 spring bed, kamar mandi dalam, 1 lemari baju per kamar. Hubungi admin.">
+<meta name="description" content="Apel Kos: kos putri Surabaya Barat di Jl. Kedurus IV Apel No.37. Wifi gratis, dapur umum, per kamar ada 1 spring bed, 1 kamar mandi dalam, 1 lemari baju, 1 AC, dan 1 meja kerja.">
 <meta name="keywords" content="kos surabaya barat, kos putri surabaya barat, kos surabaya, kos kedurus, kos putri surabaya, kos putri surabaya barat, kos pasar pertiga, kos gubeng, kos manyar, kos tenggilis, kos medo, kos elit, penginapan kedurus, kos dekat politeknik, kos lengkap">
 <meta name="author" content="Apel Kos">
 <meta name="robots" content="index, follow, max-image-preview:large">
@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="Apel Kos">
 <meta property="og:url" content="https://apelkos.com/">
 <meta property="og:title" content="Kos Putri Surabaya Barat - Apel Kos">
-<meta property="og:description" content="Kos putri Surabaya Barat di Kedurus IV Apel No.37. Wifi gratis, dapur umum, kamar mandi dalam, 1 spring bed & 1 lemari baju per kamar.">
+<meta property="og:description" content="Kos putri Surabaya Barat di Kedurus IV Apel No.37. Wifi gratis, dapur umum, per kamar ada 1 spring bed, 1 kamar mandi dalam, 1 lemari baju, 1 AC, dan 1 meja kerja.">
 <meta property="og:locale" content="id_ID">
 <meta name="twitter:card" content="summary_large_image">
 
@@ -27,7 +27,7 @@
   "@type": "LodgingBusiness",
   "name": "Apel Kos",
   "alternateName": "Kos Putri Surabaya Barat Apel Kos",
-  "description": "Kos putri Surabaya Barat di Jl. Kedurus IV Apel No.37 dengan wifi gratis, dapur umum, 1 spring bed, 1 kamar mandi dalam, dan 1 lemari baju per kamar.",
+  "description": "Kos putri Surabaya Barat di Jl. Kedurus IV Apel No.37 dengan wifi gratis, dapur umum, serta 1 spring bed, 1 kamar mandi dalam, 1 lemari baju, 1 AC, dan 1 meja kerja per kamar.",
   "url": "https://apelkos.com/",
   "telephone": "+6281234567890",
   "image": "https://apelkos.com/images/1.jpg",
@@ -84,6 +84,16 @@
     },
     {
       "@type": "LocationFeatureSpecification",
+      "name": "1 AC per kamar",
+      "value": true
+    },
+    {
+      "@type": "LocationFeatureSpecification",
+      "name": "1 Meja Kerja per kamar",
+      "value": true
+    },
+    {
+      "@type": "LocationFeatureSpecification",
       "name": "CCTV 24 jam",
       "value": true
     }
@@ -108,7 +118,7 @@
       "name": "Fasilitas apa saja di setiap kamar?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Setiap kamar dilengkapi 1 spring bed, 1 kamar mandi private di dalam kamar, dan 1 lemari baju. Semua kamar juga punya meja belajar, lampu, dan stopkontak."
+        "text": "Setiap kamar dilengkapi 1 spring bed, 1 kamar mandi private di dalam kamar, 1 lemari baju, 1 AC, dan 1 meja kerja. Semua kamar juga punya lampu kamar dan stopkontak."
       }
     },
     {
@@ -318,6 +328,83 @@
   details[open] summary::after{content:"\2212";}
   details p{margin-top:10px;color:var(--muted);font-size:15px;}
 
+  /* ===== GALERI ===== */
+  .tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:28px;}
+  .tab{
+    padding:10px 22px;border-radius:999px;border:2px solid var(--line);background:#fff;
+    font-weight:600;font-size:15px;color:var(--muted);cursor:pointer;transition:.2s;
+  }
+  .tab.on{background:var(--green);border-color:var(--green);color:#fff;}
+  .pane{display:none;}
+  .pane.on{display:block;}
+
+  /* viewer 360 */
+  .pano{
+    position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);
+    box-shadow:var(--shadow);background:#e9ecea;height:430px;
+    cursor:grab;touch-action:none;user-select:none;
+  }
+  .pano.drag{cursor:grabbing;}
+  .pano .strip{
+    position:absolute;top:50%;left:0;max-width:none;transform:translateY(-50%);
+    display:block;pointer-events:none;-webkit-user-drag:none;will-change:transform;
+  }
+  .pano .empty{
+    position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;
+    background:repeating-linear-gradient(45deg,#eef1ef 0 14px,#e7ebe8 14px 28px);
+    color:var(--muted);
+  }
+  .pano .empty span{display:block;font-size:38px;margin-bottom:8px;opacity:.5;}
+  .pano .empty b{display:block;color:var(--green-dark);font-size:16px;margin-bottom:4px;}
+  .pano .empty small{font-size:13px;}
+  .pano .hint{
+    position:absolute;left:50%;bottom:14px;transform:translateX(-50%);
+    background:rgba(20,41,32,.75);color:#fff;padding:8px 16px;border-radius:999px;
+    font-size:13px;pointer-events:none;
+  }
+  .pano .badge{
+    position:absolute;left:14px;top:14px;background:rgba(20,41,32,.75);color:#fff;
+    padding:6px 13px;border-radius:999px;font-size:13px;font-weight:600;
+  }
+  .pano-ctl{display:flex;gap:12px;justify-content:center;align-items:center;margin-top:14px;flex-wrap:wrap;}
+  .pano-ctl button{
+    width:44px;height:44px;border-radius:50%;border:2px solid var(--line);background:#fff;
+    color:var(--green-dark);font-size:20px;cursor:pointer;transition:.2s;
+  }
+  .pano-ctl button:hover{background:var(--green);color:#fff;border-color:var(--green);}
+
+  /* grid foto biasa + lightbox */
+  .gal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;}
+  .gal-item{
+    position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);
+    background:#fff;cursor:pointer;transition:.25s;padding:0;
+  }
+  .gal-item:hover{transform:translateY(-5px);box-shadow:var(--shadow);}
+  .gal-item img{width:100%;height:170px;object-fit:cover;display:block;}
+  .gal-item .ph{
+    width:100%;height:170px;display:grid;place-items:center;text-align:center;padding:14px;
+    background:repeating-linear-gradient(45deg,#eef1ef 0 12px,#e7ebe8 12px 24px);
+    color:var(--muted);font-size:13px;
+  }
+  .gal-item .cap{
+    padding:10px 12px;font-size:14px;font-weight:600;color:var(--green-dark);text-align:left;
+  }
+  .lb{
+    position:fixed;inset:0;background:rgba(12,26,20,.92);z-index:200;display:none;
+    place-items:center;padding:24px;
+  }
+  .lb.on{display:grid;}
+  .lb img{max-width:92vw;max-height:86vh;border-radius:10px;display:block;}
+  .lb .close{
+    position:absolute;top:16px;right:16px;width:44px;height:44px;border-radius:50%;
+    border:0;background:#fff;color:#111;font-size:22px;cursor:pointer;
+  }
+  .lb .nav-lb{
+    position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;
+    border:0;background:rgba(255,255,255,.9);font-size:24px;cursor:pointer;
+  }
+  .lb .prev-lb{left:16px;} .lb .next-lb{right:16px;}
+
   /* ===== CTA ===== */
   .cta{
     background:linear-gradient(135deg,var(--green-dark),var(--green));
@@ -393,6 +480,7 @@
       <a href="#kamar">Isi Kamar</a>
       <a href="#lokasi">Lokasi</a>
       <a href="#faq">FAQ</a>
+      <a href="#galeri">Galeri</a>
       <a href="#" class="btn btn-primary" data-wa>Hubungi Admin</a>
     </nav>
   </div>
@@ -407,7 +495,7 @@
       <p class="lead">
         <strong>Kos putri Surabaya Barat</strong> dengan suasana homey, letak strategis, serta
         fasilitas yang lengkap. Dekat kampus, kantor, serta akses transportasi publik yang gampang.
-        Setiap kamar ada 1 spring bed, 1 kamar mandi private, dan 1 lemari baju.
+        Setiap kamar ada 1 spring bed, 1 kamar mandi private, 1 lemari baju, 1 AC, dan 1 meja kerja.
       </p>
       <div class="hero-cta">
         <a href="#" class="btn btn-wa" data-wa>Chat Admin via WhatsApp</a>
@@ -497,6 +585,16 @@
         <p>Lemari penyimpanan pakaian di dalam kamar, cukup untuk kebutuhan harian.</p>
       </div>
       <div class="card">
+        <div class="ico">❄️</div>
+        <h3>1 AC</h3>
+        <p>Setiap kamar dilengkapi 1 unit AC, sehingga penghuni tetap nyaman dan hemat listrik.</p>
+      </div>
+      <div class="card">
+        <div class="ico">🪑</div>
+        <h3>1 Meja Kerja</h3>
+        <p>Setiap kamar punya 1 meja kerja untuk belajar, mengerjakan tugas, dan bekerja.</p>
+      </div>
+      <div class="card">
         <div class="ico">🧺</div>
         <h3>Ruang Umum</h3>
         <p>Tempat santai, area jaga motor, dan lingkungan aman dengan CCTV 24 jam.</p>
@@ -518,6 +616,8 @@
       <div class="room"><span>🛏️</span><div>1 Spring Bed<small>Kasur nyaman dan bergaya modern</small></div></div>
       <div class="room"><span>🚿</span><div>1 Kamar Mandi<small>Private di dalam kamar</small></div></div>
       <div class="room"><span>🚪</span><div>1 Lemari Baju<small>Penyimpanan pakaian</small></div></div>
+      <div class="room"><span>❄️</span><div>1 AC<small>Pendingin ruangan</small></div></div>
+      <div class="room"><span>🪑</span><div>1 Meja Kerja<small>Untuk belajar dan bekerja</small></div></div>
     </div>
   </div>
 </section>
@@ -546,7 +646,9 @@
           <li>1 unit <strong>spring bed</strong> yang nyaman untuk tidur sendirian</li>
           <li>1 unit <strong>kamar mandi</strong> private di dalam kamar (tidak berbagi)</li>
           <li>1 unit <strong>lemari baju</strong> untuk menyimpan pakaian dan kebutuhan harian</li>
-          <li>Meja belajar, lampu kamar, dan stopkontak di dalam kamar</li>
+          <li>1 unit <strong>AC</strong> sebagai pendingin ruangan</li>
+          <li>1 unit <strong>meja kerja</strong> untuk belajar maupun bekerja</li>
+          <li>Lampu kamar dan stopkontak di dalam kamar</li>
         </ul>
 
         <h3>Fasilitas bersama yang sudah ada</h3>
@@ -613,6 +715,73 @@
   </div>
 </section>
 
+<!-- ======================= GALERI ======================= -->
+<section id="galeri">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="line-deco"></div>
+      <h2>Galeri Apel Kos</h2>
+      <p>Lihat kondisi kamar Apel Kos dari dalam. Geser untuk melihat foto 360 derajat.</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab on" data-pane="p360">Foto 360&deg;</button>
+      <button class="tab" data-pane="pflat">Foto Biasa</button>
+    </div>
+
+    <!-- ===== PANO 360 DERAJAT =====
+         CARA ISI:
+         1. Foto WAJIB panorama equirectangular (rasio lebar:tinggi = 2:1),
+            contoh diambil dari kamera 360 atau Google Street View.
+         2. Simpan ke folder images/360/ dengan nama 1.jpg
+         3. Uncomment baris <img class="strip" ...> di bawah
+         4. Hapus blok <div class="empty">...</div> supaya placeholder hilang
+         5. Kalau ingin zoom lebih dekat, naikkan nilai ZOOM di JavaScript. -->
+    <div class="pane on" id="p360">
+      <div class="pano" id="pano">
+        <!-- GANTI: <img class="strip" src="images/360/1.jpg" alt="Foto 360 kamar Apel Kos">
+             Hapus blok <div class="empty">...</div> di bawah setelah foto diisi.
+             Syarat: foto HARUS panorama equirectangular (rasio 2:1, lebar 2x tinggi). -->
+        <div class="empty">
+          <div><span>🗜</span><b>Foto 360&deg; Derajat</b><small>Belum diisi &mdash; taruh foto panorama di <code>images/360/1.jpg</code> (rasio 2:1)</small></div>
+        </div>
+        <span class="badge">360&deg;</span>
+        <span class="hint">Geser kiri / kanan atau swipe untuk memutar</span>
+      </div>
+      <div class="pano-ctl">
+        <button type="button" id="pLeft" aria-label="Putar kiri">&#8249;</button>
+        <button type="button" id="pReset" aria-label="Reset" style="font-size:15px;font-weight:700">Reset</button>
+        <button type="button" id="pRight" aria-label="Putar kanan">&#8250;</button>
+      </div>
+    </div>
+
+    <!-- ===== FOTO BIASA =====
+         CARA ISI: simpan foto ke images/galeri/1.jpg ... 8.jpg lalu
+         ganti tiap <div class="ph"> dengan:
+         <img src="images/galeri/1.jpg" alt="Kamar kos putri Apel Kos"> -->
+    <div class="pane" id="pflat">
+      <div class="gal-grid" id="galGrid">
+        <button class="gal-item" type="button"><div class="ph">Foto 1<br>images/galeri/1.jpg</div><div class="cap">Kamar tidur</div></button>
+        <button class="gal-item" type="button"><div class="ph">Foto 2<br>images/galeri/2.jpg</div><div class="cap">Kamar mandi dalam</div></button>
+        <button class="gal-item" type="button"><div class="ph">Foto 3<br>images/galeri/3.jpg</div><div class="cap">Dapur umum</div></button>
+        <button class="gal-item" type="button"><div class="ph">Foto 4<br>images/galeri/4.jpg</div><div class="cap">Ruang tamu</div></button>
+        <button class="gal-item" type="button"><div class="ph">Foto 5<br>images/galeri/5.jpg</div><div class="cap">Tampak luar</div></button>
+        <button class="gal-item" type="button"><div class="ph">Foto 6<br>images/galeri/6.jpg</div><div class="cap">Area parkir</div></button>
+        <button class="gal-item" type="button"><div class="ph">Foto 7<br>images/galeri/7.jpg</div><div class="cap">Meja kerja &amp; AC</div></button>
+        <button class="gal-item" type="button"><div class="ph">Foto 8<br>images/galeri/8.jpg</div><div class="cap">Lemari baju</div></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div class="lb" id="lb">
+  <button class="close" id="lbClose" aria-label="Tutup">&times;</button>
+  <button class="nav-lb prev-lb" id="lbPrev" aria-label="Sebelumnya">&#8249;</button>
+  <img id="lbImg" src="" alt="Galeri Apel Kos">
+  <button class="nav-lb next-lb" id="lbNext" aria-label="Berikutnya">&#8250;</button>
+</div>
+
 <!-- ======================= FAQ ======================= -->
 <section id="faq" style="background:var(--green-light)">
   <div class="wrap">
@@ -630,7 +799,7 @@
 
       <details>
         <summary>Fasilitas apa saja di setiap kamar?</summary>
-        <p>Setiap kamar dilengkapi 1 spring bed, 1 kamar mandi private di dalam kamar, dan 1 lemari baju. Semua kamar juga punya meja belajar, lampu, dan stopkontak.</p>
+        <p>Setiap kamar dilengkapi 1 spring bed, 1 kamar mandi private di dalam kamar, 1 lemari baju, 1 AC, dan 1 meja kerja. Semua kamar juga punya lampu kamar dan stopkontak.</p>
       </details>
 
       <details>
@@ -744,6 +913,118 @@ var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih
   });
 
   go(0); reset();
+
+  // ===== GALERI: TAB =====
+  var tabs = document.querySelectorAll(".tab");
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){ x.classList.remove("on"); });
+      t.classList.add("on");
+      document.querySelectorAll(".pane").forEach(function(pn){
+        pn.classList.toggle("on", pn.id === t.dataset.pane);
+      });
+    });
+  });
+
+  // ===== PANORAMA 360 (drag / swipe) =====
+  var pano  = document.getElementById("pano");
+  var strip = pano.querySelector("img.strip");
+  var pan = 0, dragging = false, sx = 0, sp = 0;
+
+  // ZOOM: 1 = panorama pas-lebar (tidak bisa berputar).
+  // 2 = lebar gambar 2x viewport, jadi 1 layar drag = sekitar 180 derajat.
+  // Naikkan ke 3 atau 4 kalau ingin zoom lebih dekat.
+  var ZOOM = 2;
+
+  function fit(){
+    if(!strip || !strip.naturalWidth) return;
+    var nw = strip.naturalWidth, nh = strip.naturalHeight;
+    var scale = Math.max(pano.clientWidth / nw, pano.clientHeight / nh) * ZOOM;
+    strip.style.width  = Math.round(nw * scale) + "px";
+    strip.style.height = Math.round(nh * scale) + "px";
+    pan = clampPx(pan);
+    paint();
+  }
+  function maxPan(){
+    return strip ? Math.max(0, strip.offsetWidth - pano.clientWidth) : 0;
+  }
+  function clampPx(v){ return Math.max(0, Math.min(maxPan(), v)); }
+  function paint(){
+    if(strip) strip.style.transform = "translateX(" + (-pan) + "px) translateY(-50%)";
+  }
+  function nudge(d){ pan = clampPx(pan + d); paint(); }
+  function reset(){ pan = 0; paint(); }
+
+  function down(x){ dragging = true; sx = x; sp = pan; pano.classList.add("drag"); }
+  function move(x){
+    if(!dragging) return;
+    pan = clampPx(sp - (x - sx));   // geser kanan -> lihat sisi kiri foto
+    paint();
+  }
+  function up(){ dragging = false; pano.classList.remove("drag"); }
+
+  if(strip){
+    strip.setAttribute("draggable", "false");
+    strip.addEventListener("load", function(){ fit(); reset(); });
+    window.addEventListener("resize", fit);
+    if(strip.complete && strip.naturalWidth) fit();
+  }
+
+  pano.addEventListener("mousedown", function(e){ if(!strip) return; down(e.clientX); e.preventDefault(); });
+  window.addEventListener("mousemove", function(e){ move(e.clientX); });
+  window.addEventListener("mouseup", up);
+  pano.addEventListener("touchstart", function(e){ if(strip) down(e.touches[0].clientX); }, {passive:true});
+  pano.addEventListener("touchmove",  function(e){ if(strip) move(e.touches[0].clientX); }, {passive:true});
+  pano.addEventListener("touchend",   up);
+
+  document.getElementById("pLeft").addEventListener("click",  function(){ nudge(-pano.clientWidth * 0.25); });
+  document.getElementById("pRight").addEventListener("click", function(){ nudge( pano.clientWidth * 0.25); });
+  document.getElementById("pReset").addEventListener("click", reset);
+
+  document.addEventListener("keydown", function(e){
+    if(document.getElementById("lb").classList.contains("on")){
+      if(e.key === "Escape") closeLb();
+      if(e.key === "ArrowLeft")  stepLb(-1);
+      if(e.key === "ArrowRight") stepLb(1);
+    }
+  });
+
+  // ===== LIGHTBOX (klik foto untuk perbesar) =====
+  var lb = document.getElementById("lb"),
+      lbImg = document.getElementById("lbImg"),
+      items = [].slice.call(document.querySelectorAll("#galGrid .gal-item")),
+      cur = 0, photos = [];
+
+  items.forEach(function(it){
+    var img = it.querySelector("img");
+    if(img) photos.push({ src: img.getAttribute("src"), alt: img.getAttribute("alt") || "" });
+  });
+
+  function show(i){
+    if(!photos.length) return;           // belum ada foto -> abaikan
+    cur = (i + photos.length) % photos.length;
+    lbImg.src = photos[cur].src;
+    lbImg.alt = photos[cur].alt;
+    lb.classList.add("on");
+    document.body.style.overflow = "hidden";
+  }
+  function stepLb(d){ show(cur + d); }
+  function closeLb(){ lb.classList.remove("on"); document.body.style.overflow = ""; }
+
+  items.forEach(function(it, i){
+    it.addEventListener("click", function(){
+      if(!photos.length) return;
+      // cari index foto yang diklik
+      var img = it.querySelector("img");
+      var idx = img ? photos.findIndex(function(p){ return p.src === img.getAttribute("src"); }) : -1;
+      show(idx < 0 ? 0 : idx);
+    });
+  });
+
+  document.getElementById("lbClose").addEventListener("click", closeLb);
+  document.getElementById("lbPrev").addEventListener("click", function(){ stepLb(-1); });
+  document.getElementById("lbNext").addEventListener("click", function(){ stepLb(1); });
+  lb.addEventListener("click", function(e){ if(e.target === lb) closeLb(); });
 })();
 </script>
 </body>
