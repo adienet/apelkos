@@ -1359,8 +1359,16 @@ var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih
   }
 
   // ---------- video & iframe (tanpa bola WebGL) ----------
+  // PENTING: destroy() WAJIB dipanggil SEBELUM kanvas dicabut dari DOM.
+  // library melakukan parent.removeChild(container); kalau container-nya
+  // sudah hilang, melempar NotFoundError, viewer baru tidak pernah
+  // dibuat, dan yang tampil hanya kotak hitam.
   function stopViewer(){
-    if(viewer){ viewer.destroy(); viewer = null; }
+    if(viewer){
+      try{ viewer.destroy(); }
+      catch(e){ /* kanvas sudah tidak ada di DOM, aman diabaikan */ }
+      viewer = null;
+    }
     ["pSpin","pFs"].forEach(function(id){
       var el = document.getElementById(id);
       el.style.background = ""; el.style.color = ""; el.style.borderColor = "";
@@ -1398,6 +1406,7 @@ var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih
   // Halaman tidak boleh jadi buntu. Foto ditampilkan penuh sebagai
   // gambar biasa, plus alasan kenapa mode 360 tidak bisa jalan.
   function noWebGL(item, why){
+    // viewer dibiarkan hidup? tidak ada artinya tanpa WebGL, buang.
     stopViewer();
     var PSV = window.PhotoSphereViewer;
     var det = PSV && PSV.SYSTEM
@@ -1424,6 +1433,13 @@ var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih
   }
 
   // ---------- bola 360 ----------
+  // Viewer dibuat SATU KALI lalu dipakai ulang. Setiap PSV.Viewer baru
+  // membuat WebGL context sendiri, dan browser membatasi jumlahnya
+  // (sekitar 8-16). Kalau dibuat ulang tiap klik foto, setelah beberapa
+  // kali ganti foto context habis dan layar jadi hitam / tidak load.
+  // Ganti foto cukup lewat setPanorama() pada viewer yang sama.
+  var lastLabel = "";
+
   function mountSphere(item, index){
     clearFail();
     barEl.style.display = "";
@@ -1445,12 +1461,43 @@ var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih
         return;
       }
 
-      stopViewer();
+      // viewer masih hidup -> cuma ganti fotonya, jangan buat baru
+      if(viewer){
+        lastLabel = item.label || "360";
+        try{
+          // caption ikut lewat opsi setPanorama, bukan setCaption()
+          // (setCaption itu milik navbar, bukan Viewer)
+          // setPanorama mengembalikan promise: menolak kalau fotonya gagal.
+          var p = viewer.setPanorama(item.src, {
+            caption: lastLabel,
+            transition: false,
+            showLoader: true
+          });
+          if(p && p.catch){
+            p.catch(function(err){
+              // jangan ganggu kalau pengguna sudah pindah ke foto lain
+              if(!curItem || curItem.src !== item.src) return;
+              fail("<div><b>Foto 360 gagal dimuat</b><small>" +
+                   "File-nya mungkin belum terunggah, atau koneksi terputus. " +
+                   "Coba muat ulang halaman.</small>" +
+                   '<a href="' + item.src + '" target="_blank" rel="noopener">Buka foto langsung</a></div>');
+            });
+          }
+        } catch(err){
+          viewer = null;
+          fail("<div><b>Foto 360 gagal dimuat</b><small>" +
+               (err && err.message ? err.message : "Kesalahan tidak diketahui") + "</small>" +
+               '<a href="' + item.src + '" target="_blank" rel="noopener">Buka foto langsung</a></div>');
+        }
+        return;
+      }
+
+      lastLabel = item.label || "360";
       try{
         viewer = new PSV.Viewer({
           container: pano,
           panorama: item.src,
-          caption: item.label || "360",
+          caption: lastLabel,
           // 100 = paling dekat, 0 = paling jauh
           defaultZoomLvl: 50,
           minFov: 28,          // zoom in terdekat
@@ -1493,9 +1540,9 @@ var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih
       viewer.on("panorama-loaded", function(){
         badgeEl.textContent = "Seret untuk memutar";
         // FACE AWAL: ikut setting long/lat/zoom di PANO_360
-        var pos = startPos(item);
+        var pos = startPos(curItem || {});
         viewer.rotate(pos);
-        viewer.zoom(startZoom(item));
+        viewer.zoom(startZoom(curItem || {}));
         updateHead();
       });
       viewer.on("fullscreen-updated", updateFs);
@@ -1546,10 +1593,19 @@ var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih
     var k = kind(item);
     showInfo(item);
 
-    // bersihkan isi sebelumnya
+    // Viewer 360 dibangun ulang hanya kalau belum ada / sebelumnya bukan
+    // mode gambar. Selama mode gambar, kanvas PSV dibiarkan utuh dan
+    // fotonya ditukar lewat setPanorama(). Kanvas yang dicabut duluan
+    // bikin destroy() gagal dan layar jadi hitam permanen.
+    if(k !== "image") stopViewer();
+
     var keep = [emptyEl, badgeEl, hintEl, errEl, headEl];
     Array.prototype.slice.call(pano.children).forEach(function(el){
-      if(keep.indexOf(el) === -1) el.remove();
+      if(keep.indexOf(el) !== -1) return;
+      //jangan sentuh kanvas PSV yang masih dipakai viewer
+      if(k === "image" && viewer && el.classList
+         && el.classList.contains("psv-container")) return;
+      el.remove();
     });
     if(!viewer) clearFail();
 
