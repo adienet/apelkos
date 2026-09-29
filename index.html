@@ -64,7 +64,7 @@
     },
     {
       "@type": "LocationFeatureSpecification",
-      "name": "Dapur Umum",
+      "name": "Dapur",
       "value": true
     },
     {
@@ -350,12 +350,21 @@
     position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);
     box-shadow:var(--shadow);background:#000;
     height:clamp(320px,58vh,520px);
+    /* Android: tanpa ini, browser menganggap gestur sebagai scroll
+       halaman sehingga panorama tidak bisa diputar. Wajib ada di .pano
+       DAN turunannya (psv-container / canvas) karena Android menghitung
+       touch-action per elemen yang disentuh. */
     touch-action:none;
+    -ms-touch-action:none;
   }
   /* PSV mengisi penuh kontainer */
-  .pano .psv-container{width:100%;height:100%;}
-  .pano .psv-canvas-container{width:100%;height:100%;}
-  .pano .psv-canvas{display:block;width:100%;height:100%;}
+  .pano .psv-container{width:100%;height:100%;touch-action:none;-ms-touch-action:none;}
+  .pano .psv-canvas-container{width:100%;height:100%;touch-action:none;-ms-touch-action:none;}
+  .pano .psv-canvas{
+    display:block;width:100%;height:100%;touch-action:none;-ms-touch-action:none;
+    /* cegah Android memilih teks / zoom double-tap saat drag */
+    -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  }
   /* bilah tombol bawaan PSV */
   .pano .psv-navbar{
     top:auto!important;bottom:12px!important;left:50%!important;
@@ -649,7 +658,7 @@
 
         <div class="slide">
           <img src="images/galeri/dapur-web.jpg"
-               alt="Dapur umum kos Surabaya Barat Apel Kos lengkap dengan kompor dan kulkas">
+               alt="Dapur kos Surabaya Barat Apel Kos lengkap dengan kompor dan kulkas">
         </div>
 
         <div class="slide">
@@ -682,8 +691,8 @@
       </div>
       <div class="card">
         <div class="ico">🍳</div>
-        <h3>Dapur Umum</h3>
-        <p>Dapur bersama lengkap dengan kompor, kulkas, dan area makan yang luas.</p>
+        <h3>Dapur Kontrakan</h3>
+        <p>Dapur kontrakan lengkap dengan wastefel, dan area makan yang luas.</p>
       </div>
       <div class="card">
         <div class="ico">🛏️</div>
@@ -839,19 +848,20 @@
       <h2>Galeri Apel Kos</h2>
       <p>
         Lihat kondisi nyata Apel Kos dari dalam. Geser foto untuk memutar
-        <strong>360&deg;</strong> di 6 titik, atau klik foto biasa untuk memperbesar.
-        Semua foto diambil langsung di lokasi, tanpa filter.
+        <strong>360&deg;</strong> di 7 titik, atau klik foto biasa untuk memperbesar.
+        Di HP: 1 jari untuk memutar, 2 jari untuk zoom. Semua foto diambil
+        langsung di lokasi, tanpa filter.
       </p>
     </div>
 
     <div class="tabs">
       <button class="tab on" data-pane="p360">
         <span class="ico">&#127909;</span> Foto 360&deg;
-        <em>6 titik</em>
+        <em>7 titik</em>
       </button>
       <button class="tab" data-pane="pflat">
         <span class="ico">&#128444;</span> Foto Biasa
-        <em>7 foto</em>
+        <em>8 foto</em>
       </button>
     </div>
 
@@ -859,10 +869,11 @@
          Foto disimpan sendiri di folder images/360/ pada website ini.
          Tidak memakai layanan pihak ketiga, tidak ada watermark.
 
-         FILE YANG SEDANG DIPAKAI (6 titik):
+         FILE YANG SEDANG DIPAKAI (7 titik):
          - depan.jpg               tampak depan kos
          - kontrakankamar1.jpg     kamar tidur
-         - kontrakandapur.jpg      dapur umum
+         - kamarkos.jpg            kamar kos (tipe terbaru)
+         - kontrakandapur.jpg      dapur kontrakan
          - kontrakanteras.jpg     teras & ruang santai
          - teraskosjpg.jpg         teras atas kos
          - tandonjemuranjpg.jpg    area jemuran
@@ -986,6 +997,19 @@
           <figcaption class="cap">
             <b>Ruang Kamar</b>
             <small>Spring bed, AC, lemari, dan meja kerja dalam satu kamar.</small>
+          </figcaption>
+        </figure>
+
+        <figure class="gal-item">
+          <button type="button" class="gal-btn"
+                  data-full="images/galeri/kamarkos-web.jpg"
+                  data-alt="Kamar kos putri Apel Kos tipe terbaru dengan spring bed dan AC">
+            <img src="images/galeri/thumbs/kamarkos.jpg" loading="lazy" decoding="async" width="480" height="270" alt="Kamar kos putri Apel Kos tipe terbaru dengan spring bed dan AC">
+            <span class="zoom" aria-hidden="true">&#128269;</span>
+          </button>
+          <figcaption class="cap">
+            <b>Kamar Kos</b>
+            <small>Kamar tipe terbaru, lengkap dengan spring bed, AC, lemari, dan meja kerja.</small>
           </figcaption>
         </figure>
 
@@ -1234,8 +1258,14 @@ var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih
     },
     {
       src: "images/360/kontrakandapur-web.jpg", thumb: "images/360/thumbs/kontrakandapur.jpg",
-      label: "Dapur Umum", icon: "🍳",
-      desc: "Dapur bersama dengan kompor, kulkas, dan area makan untuk semua penghuni.",
+      label: "Dapur Kontrakan", icon: "🍳",
+      desc: "Dapur kontrakan dengan wasftafel cuci piring, dan area makan untuk penghuni kontrakan.",
+      long: 0, lat: -5, zoom: 50
+    },
+    {
+      src: "images/360/kamarkos-web.jpg", thumb: "images/360/thumbs/kamarkos.jpg",
+      label: "Kamar Kos", icon: "🛏️",
+      desc: "Kamar tipe terbaru: 1 spring bed, 1 AC, 1 lemari, dan 1 meja kerja.",
       long: 0, lat: -5, zoom: 50
     },
     {
@@ -1506,7 +1536,12 @@ var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih
           zoomSpeed: 1.3,      // kecepatan zoom
           mousewheel: true,    // scroll = zoom langsung
           mousewheelCtrlKey: false,
-          touchmoveTwoFingers: true,  // 1 jari putar, 2 jari zoom
+          // PENTING untuk HP: harus FALSE.
+          // Kalau true, satu jari tidak memutar panorama sama sekali,
+          // hanya muncul overlay "gunakan 2 jari" -> di Android terasa
+          // tidak bisa digeser. Dengan false: 1 jari = putar,
+          // 2 jari (cubit-zoom) tetap untuk zoom.
+          touchmoveTwoFingers: false,
           moveInertia: true,
           useXmpData: true,    // pakai data Insta360 dari EXIF foto
           canvasBackground: "#000",
