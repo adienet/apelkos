@@ -30,7 +30,7 @@
   "description": "Kos putri Surabaya Barat di Jl. Kedurus IV Apel No.37 dengan wifi gratis, dapur umum, serta 1 spring bed, 1 kamar mandi dalam, 1 lemari baju, 1 AC, dan 1 meja kerja per kamar.",
   "url": "https://apelkos.com/",
   "telephone": "+6281234567890",
-  "image": "https://apelkos.com/images/1.jpg",
+  "image": "https://apelkos.com/images/galeri/tampakdepan-web.jpg",
   "priceRange": "Rp",
   "currenciesAccepted": "IDR",
   "address": {
@@ -331,24 +331,50 @@
   /* ===== GALERI ===== */
   .tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:28px;}
   .tab{
+    display:inline-flex;align-items:center;gap:8px;
     padding:10px 22px;border-radius:999px;border:2px solid var(--line);background:#fff;
     font-weight:600;font-size:15px;color:var(--muted);cursor:pointer;transition:.2s;
   }
+  .tab .ico{font-size:16px;line-height:1;}
+  .tab em{
+    font-style:normal;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;
+    background:#eef1ef;color:var(--muted);
+  }
   .tab.on{background:var(--green);border-color:var(--green);color:#fff;}
+  .tab.on em{background:rgba(255,255,255,.24);color:#fff;}
   .pane{display:none;}
   .pane.on{display:block;}
 
-  /* viewer 360 */
+  /* viewer 360 — bola WebGL asli, bisa diputar 360 derajat */
   .pano{
     position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);
-    box-shadow:var(--shadow);background:#e9ecea;height:430px;
-    cursor:grab;touch-action:none;user-select:none;
+    box-shadow:var(--shadow);background:#000;
+    height:clamp(320px,58vh,520px);
+    touch-action:none;
   }
-  .pano.drag{cursor:grabbing;}
-  .pano .strip{
-    position:absolute;top:50%;left:0;max-width:none;transform:translateY(-50%);
-    display:block;pointer-events:none;-webkit-user-drag:none;will-change:transform;
+  /* PSV mengisi penuh kontainer */
+  .pano .psv-container{width:100%;height:100%;}
+  .pano .psv-canvas-container{width:100%;height:100%;}
+  .pano .psv-canvas{display:block;width:100%;height:100%;}
+  /* bilah tombol bawaan PSV */
+  .pano .psv-navbar{
+    top:auto!important;bottom:12px!important;left:50%!important;
+    transform:translateX(-50%)!important;
+    background:rgba(20,41,32,.78)!important;border-radius:999px!important;
+    padding:5px 8px!important;display:flex!important;gap:3px!important;align-items:center!important;
   }
+  .pano .psv-button{width:40px!important;height:40px!important;min-width:40px!important;border-radius:50%;}
+  .pano .psv-button:hover{background:rgba(255,255,255,.2)!important;}
+  .pano .psv-button--active{color:#8ee6a8!important;}
+  .pano .psv-zoom-range{width:96px!important;}
+  .pano .psv-zoom-range-line,
+  .pano .psv-zoom-range-handle{background:#fff!important;}
+  .pano .psv-loader-canvas circle{stroke:#2f9e5f!important;}
+  .pano .psv-loader-text{color:#fff!important;font-size:13px!important;}
+  .pano .psv-caption{background:rgba(20,41,32,.8)!important;border-radius:999px!important;
+    font-size:13px!important;padding:5px 12px!important;}
+  .pano .psv-tooltip-content{font-size:12px!important;}
+
   .pano .empty{
     position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;
     background:repeating-linear-gradient(45deg,#eef1ef 0 14px,#e7ebe8 14px 28px);
@@ -357,29 +383,94 @@
   .pano .empty span{display:block;font-size:38px;margin-bottom:8px;opacity:.5;}
   .pano .empty b{display:block;color:var(--green-dark);font-size:16px;margin-bottom:4px;}
   .pano .empty small{font-size:13px;}
-  .pano .hint{
-    position:absolute;left:50%;bottom:14px;transform:translateX(-50%);
-    background:rgba(20,41,32,.75);color:#fff;padding:8px 16px;border-radius:999px;
-    font-size:13px;pointer-events:none;
-  }
   .pano .badge{
-    position:absolute;left:14px;top:14px;background:rgba(20,41,32,.75);color:#fff;
-    padding:6px 13px;border-radius:999px;font-size:13px;font-weight:600;
+    position:absolute;left:14px;top:14px;background:rgba(20,41,32,.78);color:#fff;
+    padding:6px 13px;border-radius:999px;font-size:13px;font-weight:600;z-index:6;
+    pointer-events:none;
   }
-  .pano-ctl{display:flex;gap:12px;justify-content:center;align-items:center;margin-top:14px;flex-wrap:wrap;}
-  .pano-ctl button{
-    width:44px;height:44px;border-radius:50%;border:2px solid var(--line);background:#fff;
-    color:var(--green-dark);font-size:20px;cursor:pointer;transition:.2s;
+  .pano .hint{
+    position:absolute;left:50%;top:14px;transform:translateX(-50%);
+    background:rgba(20,41,32,.78);color:#fff;padding:7px 15px;border-radius:999px;
+    font-size:13px;pointer-events:none;z-index:6;transition:opacity .35s;max-width:80%;text-align:center;
   }
-  .pano-ctl button:hover{background:var(--green);color:#fff;border-color:var(--green);}
+  /* kompas: arah pandang saat ini, ada juga di var PANO_360 (long) */
+  .pano .compass{
+    position:absolute;left:14px;bottom:12px;z-index:6;pointer-events:none;
+    min-width:52px;padding:5px 11px;border-radius:999px;text-align:center;
+    background:rgba(20,41,32,.78);color:#fff;
+    font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;
+  }
 
-  /* pemilih foto 360 */
-  .pano-list{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin-bottom:16px;}
-  .pano-list button{
-    padding:8px 16px;border-radius:999px;border:2px solid var(--line);background:#fff;
-    color:var(--muted);font-weight:600;font-size:14px;cursor:pointer;transition:.2s;
+  .pano .err{
+    position:absolute;inset:0;display:none;place-items:center;text-align:center;padding:24px;
+    background:#111;color:#fff;z-index:8;
   }
-  .pano-list button.on{background:var(--green);border-color:var(--green);color:#fff;}
+  .pano .err.on{display:grid;}
+  .pano .err b{display:block;margin-bottom:8px;font-size:16px;}
+  .pano .err small{display:block;font-size:13px;max-width:520px;line-height:1.65;}
+  .pano .err a{display:inline-block;margin-top:14px;padding:10px 20px;border-radius:999px;
+    background:var(--green);color:#fff;text-decoration:none;font-weight:600;font-size:14px;}
+
+  /* fallback saat WebGL tidak tersedia */
+  .pano .nogl{
+    position:absolute;left:0;right:0;bottom:0;z-index:9;display:none;
+    background:rgba(14,14,14,.93);color:#fff;padding:15px 20px;
+    border-top:1px solid rgba(255,255,255,.16);
+  }
+  .pano .nogl.on{display:block;}
+  .pano .nogl b{display:block;margin-bottom:5px;font-size:15px;}
+  .pano .nogl small{display:block;font-size:12.5px;line-height:1.6;opacity:.85;max-width:640px;}
+  .pano .nogl a{display:inline-block;margin-top:11px;padding:9px 18px;border-radius:999px;
+    background:var(--green);color:#fff;text-decoration:none;font-weight:600;font-size:13.5px;}
+
+  /* control bar di bawah viewer */
+  .pano-bar{display:flex;gap:8px;justify-content:center;align-items:center;margin-top:14px;flex-wrap:wrap;}
+  .pano-bar .grp{display:flex;gap:6px;align-items:center;}
+  .pano-bar button{
+    min-width:42px;height:42px;padding:0 13px;border-radius:12px;
+    border:2px solid var(--line);background:#fff;color:var(--green-dark);
+    font-size:17px;font-weight:600;cursor:pointer;transition:.2s;
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  }
+  .pano-bar button:hover:not(:disabled){background:var(--green);color:#fff;border-color:var(--green);}
+  .pano-bar button:disabled{opacity:.35;cursor:not-allowed;}
+  .pano-bar button.wide{font-size:13.5px;}
+  .pano-bar .lvl{
+    min-width:54px;text-align:center;font-weight:700;font-size:14px;color:var(--green-dark);
+    font-variant-numeric:tabular-nums;
+  }
+  .pano-bar .sep{width:1px;height:28px;background:var(--line);margin:0 4px;}
+
+  /* pemilih foto 360: kartu kecil dengan thumbnail */
+  .pano-list{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;margin-bottom:18px;
+  }
+  .pano-list button{
+    position:relative;padding:0;border-radius:14px;overflow:hidden;background:#fff;
+    border:2px solid var(--line);cursor:pointer;transition:.22s;text-align:left;
+  }
+  .pano-list button:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:#bcdcc9;}
+  .pano-list button.on{border-color:var(--green);box-shadow:0 0 0 3px rgba(31,122,77,.18);}
+  .pano-list button .pv{position:relative;display:block;aspect-ratio:16/9;background:#0f2a1e;}
+  .pano-list button .pv img{width:100%;height:100%;object-fit:cover;display:block;}
+  .pano-list button .pv .tag360{
+    position:absolute;left:7px;top:7px;background:rgba(20,41,32,.8);color:#fff;
+    font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;letter-spacing:.4px;
+  }
+  .pano-list button .pt{
+    display:flex;align-items:center;gap:6px;padding:9px 11px;
+    font-size:13.5px;font-weight:600;color:var(--green-dark);line-height:1.35;
+  }
+  .pano-list button.on .pt{background:var(--green);color:#fff;}
+
+  /* keterangan foto 360 yang sedang dibuka */
+  .pano-info{
+    display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;justify-content:center;
+    text-align:center;margin-bottom:14px;
+  }
+  .pano-info b{font-size:19px;color:var(--green-dark);}
+  .pano-info span{font-size:14.5px;color:var(--muted);}
   .pano video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;}
   .pano iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff;}
   .pano .err{
@@ -391,34 +482,44 @@
   .pano .err small{display:block;font-size:13px;max-width:520px;line-height:1.6;}
 
   /* grid foto biasa + lightbox */
-  .gal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;}
+  .gal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;}
   .gal-item{
-    position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);
-    background:#fff;cursor:pointer;transition:.25s;padding:0;
+    position:relative;margin:0;border-radius:14px;overflow:hidden;border:1px solid var(--line);
+    background:#fff;transition:.25s;
   }
   .gal-item:hover{transform:translateY(-5px);box-shadow:var(--shadow);}
-  .gal-item img{width:100%;height:170px;object-fit:cover;display:block;}
-  .gal-item .ph{
-    width:100%;height:170px;display:grid;place-items:center;text-align:center;padding:14px;
-    background:repeating-linear-gradient(45deg,#eef1ef 0 12px,#e7ebe8 12px 24px);
-    color:var(--muted);font-size:13px;
+  .gal-btn{
+    position:relative;display:block;width:100%;padding:0;border:0;background:#eee;cursor:pointer;
   }
-  .gal-item .cap{
-    padding:10px 12px;font-size:14px;font-weight:600;color:var(--green-dark);text-align:left;
+  .gal-btn img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;}
+  .gal-btn .zoom{
+    position:absolute;right:10px;bottom:10px;width:34px;height:34px;border-radius:50%;
+    background:rgba(20,41,32,.78);color:#fff;font-size:15px;
+    display:grid;place-items:center;opacity:0;transform:scale(.8);transition:.22s;
   }
+  .gal-item:hover .zoom{opacity:1;transform:scale(1);}
+  .gal-item .cap{padding:12px 14px;text-align:left;}
+  .gal-item .cap b{display:block;font-size:14.5px;color:var(--green-dark);margin-bottom:4px;}
+  .gal-item .cap small{display:block;font-size:12.5px;color:var(--muted);line-height:1.55;}
+
   .lb{
-    position:fixed;inset:0;background:rgba(12,26,20,.92);z-index:200;display:none;
+    position:fixed;inset:0;background:rgba(12,26,20,.93);z-index:200;display:none;
     place-items:center;padding:24px;
   }
   .lb.on{display:grid;}
-  .lb img{max-width:92vw;max-height:86vh;border-radius:10px;display:block;}
+  .lb figure{margin:0;max-width:92vw;max-height:88vh;display:grid;justify-items:center;gap:12px;}
+  .lb img{max-width:92vw;max-height:80vh;border-radius:10px;display:block;}
+  .lb .cap-lb{
+    color:#e6f0ea;font-size:14.5px;font-weight:600;text-align:center;
+  }
+  .lb .cap-lb small{display:block;font-weight:400;font-size:13px;opacity:.75;margin-top:4px;}
   .lb .close{
     position:absolute;top:16px;right:16px;width:44px;height:44px;border-radius:50%;
-    border:0;background:#fff;color:#111;font-size:22px;cursor:pointer;
+    border:0;background:#fff;color:#111;font-size:22px;cursor:pointer;z-index:2;
   }
   .lb .nav-lb{
     position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;
-    border:0;background:rgba(255,255,255,.9);font-size:24px;cursor:pointer;
+    border:0;background:rgba(255,255,255,.9);font-size:24px;cursor:pointer;z-index:2;
   }
   .lb .prev-lb{left:16px;} .lb .next-lb{right:16px;}
 
@@ -526,36 +627,34 @@
       </div>
     </div>
 
-    <!-- ===== SLIDER: GANTI FOTO DI SINI ===== -->
-    <!--
-      CARA MENGISI FOTO:
-      1. Buat folder "images" di sebelah file index.html
-      2. Simpan foto Anda sebagai images/1.jpg, images/2.jpg, images/3.jpg, images/4.jpg
-      3. Ganti isi <span class="ph">...</span> di bawah dengan:
-         <img src="images/1.jpg" alt="Kamar Apel Kos">
-      (Ulangi untuk slide berikutnya)
-    -->
+    <!-- ===== SLIDER =====
+      CARA GANTI FOTO:
+      1. Simpan foto ke images/galeri/, jalankan
+         python3 tools/optimize_images.py images/galeri/namafile.jpg
+      2. Salin satu blok <div class="slide"> di bawah, ganti src + alt-nya
+         src memakai file -web.jpg (versi ringan), bukan file master. -->
+
     <div class="slider" id="slider">
       <div class="slides" id="slides">
 
         <div class="slide">
-          <!-- <img src="images/1.jpg" alt="Kamar kos putri Surabaya Barat di Apel Kos Kedurus IV"> -->
-          <div class="ph"><div><span class="ico">🖼️</span><strong>Foto 1</strong><small>Ganti dengan &lt;img src="images/1.jpg"&gt;</small></div></div>
+          <img src="images/galeri/tampakdepan-web.jpg"
+               alt="Tampak depan kos putri Surabaya Barat Apel Kos di Kedurus IV">
         </div>
 
         <div class="slide">
-          <!-- <img src="images/2.jpg" alt="Kamar mandi dalam kos putri Surabaya Barat Apel Kos"> -->
-          <div class="ph"><div><span class="ico">🖼️</span><strong>Foto 2</strong><small>Ganti dengan &lt;img src="images/2.jpg"&gt;</small></div></div>
+          <img src="images/galeri/ruangankontrakan-web.jpg"
+               alt="Ruang kamar kos putri Surabaya Barat dengan spring bed dan AC">
         </div>
 
         <div class="slide">
-          <!-- <img src="images/3.jpg" alt="Dapur umum kos Surabaya Barat Apel Kos"> -->
-          <div class="ph"><div><span class="ico">🖼️</span><strong>Foto 3</strong><small>Ganti dengan &lt;img src="images/3.jpg"&gt;</small></div></div>
+          <img src="images/galeri/dapur-web.jpg"
+               alt="Dapur umum kos Surabaya Barat Apel Kos lengkap dengan kompor dan kulkas">
         </div>
 
         <div class="slide">
-          <!-- <img src="images/4.jpg" alt="Lokasi kos putri Surabaya Barat Jl. Kedurus IV Apel No.37"> -->
-          <div class="ph"><div><span class="ico">🖼️</span><strong>Foto 4</strong><small>Ganti dengan &lt;img src="images/4.jpg"&gt;</small></div></div>
+          <img src="images/galeri/kontrakanteras-web.jpg"
+               alt="Teras ruang santai kos putri Apel Kos">
         </div>
 
       </div>
@@ -738,72 +837,209 @@
     <div class="sec-head">
       <div class="line-deco"></div>
       <h2>Galeri Apel Kos</h2>
-      <p>Lihat kondisi kamar Apel Kos dari dalam. Geser untuk melihat foto 360 derajat.</p>
+      <p>
+        Lihat kondisi nyata Apel Kos dari dalam. Geser foto untuk memutar
+        <strong>360&deg;</strong> di 6 titik, atau klik foto biasa untuk memperbesar.
+        Semua foto diambil langsung di lokasi, tanpa filter.
+      </p>
     </div>
 
     <div class="tabs">
-      <button class="tab on" data-pane="p360">Foto 360&deg;</button>
-      <button class="tab" data-pane="pflat">Foto Biasa</button>
+      <button class="tab on" data-pane="p360">
+        <span class="ico">&#127909;</span> Foto 360&deg;
+        <em>6 titik</em>
+      </button>
+      <button class="tab" data-pane="pflat">
+        <span class="ico">&#128444;</span> Foto Biasa
+        <em>7 foto</em>
+      </button>
     </div>
 
-    <!-- ===== FOTO 360 DERAJAT =====
-         CARA ISI (support file Insta360 .insp):
-         1. Simpan file 360 ke folder images/360/
-            - .insp  = file foto 360 asli dari kamera Insta360
-            - .jpg   = panorama 2:1 (hasil export dari Insta360 Studio)
-            - .mp4   = video 360 (hasil export dari Insta360 Studio)
-         2. Buka bagian JavaScript di bawah, cari "var PANO_360"
-         3. Isi daftarnya, contoh:
-              var PANO_360 = [
-                { src: "images/360/1.insp", label: "Kamar 1", type: "insp" },
-                { src: "images/360/2.jpg",  label: "Dapur" }
-              ];
-         4. Kalau foto 360 tidak bisa dibuka, salin/rename file .insp
-            menjadi .jpg (isinya sama persis) lalu pakai nama .jpg.
+    <!-- ===== FOTO 360 DERAJAT (SELF-HOSTED) =====
+         Foto disimpan sendiri di folder images/360/ pada website ini.
+         Tidak memakai layanan pihak ketiga, tidak ada watermark.
 
-         CATATAN PENTING:
-         - File .insp itu sebenarnya JPEG dengan rasio 2:1, jadi bisa
-           langsung dipakai sebagai panorama.
-         - .insp HARUS dalam mode equirectangular. Kalau di kamera Anda
-           tersimpan dual-fisheye, gambar akan terlihat melengkung.
-           Buka di Insta360 Studio lalu export ulang ke JPG 2:1.
-         - Kalau gambar melengkung (lingkaran), itu dual-fisheye,
-           bukan equirectangular. -->    <div class="pane on" id="p360">
+         FILE YANG SEDANG DIPAKAI (6 titik):
+         - depan.jpg               tampak depan kos
+         - kontrakankamar1.jpg     kamar tidur
+         - kontrakandapur.jpg      dapur umum
+         - kontrakanteras.jpg     teras & ruang santai
+         - teraskosjpg.jpg         teras atas kos
+         - tandonjemuranjpg.jpg    area jemuran
+
+         Nama file di atas adalah file MASTER (9-12 MB, 7680x3840).
+         Yang dipakai website hanya dua versi turunan:
+           images/360/<nama>-web.jpg   dimuat viewer 360   (~0.3-1.4 MB)
+           images/360/thumbs/<nama>.jpg kartu pilihan      (~10-25 KB)
+         File master diabaikan git lewat .gitignore, jadi tidak ikut
+         ter-upload. Jangan dihapus dari komputer.
+
+         CARA TAMBAH FOTO 360 LAIN:
+         1. Simpan foto ke images/360/, misalnya "kamar-2.jpg"
+         2. Jalankan: python3 tools/optimize_images.py
+            (membuat <nama>-web.jpg + thumbs/<nama>.jpg)
+         3. Tambah satu blok baru di var PANO_360 (bagian bawah file)
+
+         ARAH PANDANG AWAL per foto (isi di var PANO_360):
+           long = arah pandang awal, 0 = tengah foto, 90 = ke kanan,
+                  180 = belakang, 270 = ke kiri
+           lat  = kemiringan, 0 = horizon di tengah layar
+           zoom = 0 paling jauh, 100 paling dekat
+         Kalau thumbnail di kartu terlihat gelap atau kosong, geser
+         nilai long (misal dari 0 ke 180) lalu jalankan ulang
+         optimize_images.py untuk memperbarui thumbnail.
+
+         SYARAT FOTO:
+         - Rasio 2:1 (lebar = 2x tinggi), contoh 7680 x 3840
+         - Proyeksi equirectangular
+         - .insp dari Insta360 bisa langsung dipakai. Kalau gagal
+           dibuka, salin/rename menjadi .jpg (isi file sama). -->
+
+    <div class="pane on" id="p360">
       <!-- Daftar foto 360 diatur di JavaScript: cari var PANO_360 (bagian bawah file) -->
       <div class="pano-list" id="panoList" hidden></div>
+
+      <!-- keterangan foto yang sedang dibuka -->
+      <div class="pano-info" id="panoInfo" hidden>
+        <b id="panoName"></b>
+        <span id="panoDesc"></span>
+      </div>
 
       <div class="pano" id="pano">
         <div class="empty" id="panoEmpty">
           <div><span>🗜</span><b>Foto 360&deg; Derajat</b>
-          <small>Belum diisi. Taruh file di <code>images/360/</code>, lalu daftarkan di <code>var PANO_360</code>.</small></div>
+          <small>Belum diisi. Taruh file panorama di <code>images/360/</code>, lalu daftarkan di <code>var PANO_360</code>.</small></div>
         </div>
         <span class="badge" id="panoBadge">360&deg;</span>
-        <span class="hint" id="panoHint">Geser kiri / kanan atau swipe untuk memutar</span>
+        <span class="hint" id="panoHint">Seret untuk memutar 360&deg; &mdash; scroll atau tombol untuk zoom</span>
+        <span class="compass" id="panoHead" title="Arah pandang saat ini">0&deg;</span>
+        <div class="err" id="panoErr"></div>
       </div>
 
-      <div class="pano-ctl" id="panoCtl">
-        <button type="button" id="pPrev" aria-label="Foto sebelumnya">&#8249;</button>
-        <button type="button" id="pLeft" aria-label="Putar kiri">&#8592;</button>
-        <button type="button" id="pReset" aria-label="Reset">Reset</button>
-        <button type="button" id="pRight" aria-label="Putar kanan">&#8594;</button>
-        <button type="button" id="pNext" aria-label="Foto berikutnya">&#8250;</button>
+      <div class="pano-bar" id="panoBar">
+        <div class="grp" id="grpNav" hidden>
+          <button type="button" id="pPrev" aria-label="Foto sebelumnya" title="Foto sebelumnya">&#8249;</button>
+          <button type="button" id="pNext" aria-label="Foto berikutnya" title="Foto berikutnya">&#8250;</button>
+        </div>
+        <span class="sep" id="sep1" hidden></span>
+
+        <div class="grp">
+          <button type="button" id="pZoomOut" aria-label="Perkecil" title="Perkecil">&minus;</button>
+          <span class="lvl" id="pZoomLvl">50%</span>
+          <button type="button" id="pZoomIn" aria-label="Perbesar" title="Perbesar">+</button>
+        </div>
+
+        <span class="sep" id="sep2"></span>
+
+        <div class="grp">
+          <button type="button" id="pSpin" class="wide" title="Putar otomatis">&#8635; Putar</button>
+          <button type="button" id="pReset" class="wide" title="Kembali ke tengah dan zoom normal">&#10226; Reset</button>
+          <button type="button" id="pFs" class="wide" title="Layar penuh">&#9974; Layar Penuh</button>
+        </div>
       </div>
     </div>
 
     <!-- ===== FOTO BIASA =====
-         CARA ISI: simpan foto ke images/galeri/1.jpg ... 8.jpg lalu
-         ganti tiap <div class="ph"> dengan:
-         <img src="images/galeri/1.jpg" alt="Kamar kos putri Apel Kos"> -->
+         CARA TAMBAH FOTO:
+         1. Simpan foto ke images/galeri/, misalnya "mejakerja.jpg"
+         2. Jalankan tools/optimize_images.py images/galeri/mejakerja.jpg
+         3. Tambah satu <figure class="gal-item"> di bawah (salin pola yang ada)
+
+         src  = versi ringan untuk grid (thumbs/)
+         full = versi lebih besar saat diklik (file -web.jpg)
+         alt  = penanda alt text SEO, isi sesuai isi fotonya -->
     <div class="pane" id="pflat">
       <div class="gal-grid" id="galGrid">
-        <button class="gal-item" type="button"><div class="ph">Foto 1<br>images/galeri/1.jpg</div><div class="cap">Kamar tidur</div></button>
-        <button class="gal-item" type="button"><div class="ph">Foto 2<br>images/galeri/2.jpg</div><div class="cap">Kamar mandi dalam</div></button>
-        <button class="gal-item" type="button"><div class="ph">Foto 3<br>images/galeri/3.jpg</div><div class="cap">Dapur umum</div></button>
-        <button class="gal-item" type="button"><div class="ph">Foto 4<br>images/galeri/4.jpg</div><div class="cap">Ruang tamu</div></button>
-        <button class="gal-item" type="button"><div class="ph">Foto 5<br>images/galeri/5.jpg</div><div class="cap">Tampak luar</div></button>
-        <button class="gal-item" type="button"><div class="ph">Foto 6<br>images/galeri/6.jpg</div><div class="cap">Area parkir</div></button>
-        <button class="gal-item" type="button"><div class="ph">Foto 7<br>images/galeri/7.jpg</div><div class="cap">Meja kerja &amp; AC</div></button>
-        <button class="gal-item" type="button"><div class="ph">Foto 8<br>images/galeri/8.jpg</div><div class="cap">Lemari baju</div></button>
+        <figure class="gal-item">
+          <button type="button" class="gal-btn"
+                  data-full="images/galeri/tampakdepan-web.jpg"
+                  data-alt="Tampak depan kos putri Apel Kos di Kedurus IV Surabaya">
+            <img src="images/galeri/thumbs/tampakdepan.jpg" loading="lazy" decoding="async" width="480" height="270" alt="Tampak depan kos putri Apel Kos">
+            <span class="zoom" aria-hidden="true">&#128269;</span>
+          </button>
+          <figcaption class="cap">
+            <b>Tampak Depan Apel Kos</b>
+            <small>Bagian depan kos beserta pagar dan area parkir motor.</small>
+          </figcaption>
+        </figure>
+
+        <figure class="gal-item">
+          <button type="button" class="gal-btn"
+                  data-full="images/galeri/kontrakandepan-web.jpg"
+                  data-alt="Tampak depan kontrakan Apel Kos dari arah jalan">
+            <img src="images/galeri/thumbs/kontrakandepan.jpg" loading="lazy" decoding="async" width="480" height="270" alt="Tampak depan kontrakan Apel Kos dari arah jalan">
+            <span class="zoom" aria-hidden="true">&#128269;</span>
+          </button>
+          <figcaption class="cap">
+            <b>Tampak Depan dari Jalan</b>
+            <small>Lokasi kos dilihat dari luar, mudah dikenali oleh tamu.</small>
+          </figcaption>
+        </figure>
+
+        <figure class="gal-item">
+          <button type="button" class="gal-btn"
+                  data-full="images/galeri/ruangankontrakan-web.jpg"
+                  data-alt="Ruang kamar kos putri Apel Kos dengan spring bed dan AC">
+            <img src="images/galeri/thumbs/ruangankontrakan.jpg" loading="lazy" decoding="async" width="480" height="270" alt="Ruang kamar kos putri Apel Kos dengan spring bed dan AC">
+            <span class="zoom" aria-hidden="true">&#128269;</span>
+          </button>
+          <figcaption class="cap">
+            <b>Ruang Kamar</b>
+            <small>Spring bed, AC, lemari, dan meja kerja dalam satu kamar.</small>
+          </figcaption>
+        </figure>
+
+        <figure class="gal-item">
+          <button type="button" class="gal-btn"
+                  data-full="images/galeri/kontrakan_kamar2-web.jpg"
+                  data-alt="Kamar kos putri Apel Kos dengan kamar mandi dalam">
+            <img src="images/galeri/thumbs/kontrakan_kamar2.jpg" loading="lazy" decoding="async" width="480" height="270" alt="Kamar kos putri Apel Kos dengan kamar mandi dalam">
+            <span class="zoom" aria-hidden="true">&#128269;</span>
+          </button>
+          <figcaption class="cap">
+            <b>Kamar &amp; Kamar Mandi Dalam</b>
+            <small>Contoh kamar dengan kamar mandi private, tanpa berbagi.</small>
+          </figcaption>
+        </figure>
+
+        <figure class="gal-item">
+          <button type="button" class="gal-btn"
+                  data-full="images/galeri/dapur-web.jpg"
+                  data-alt="Dapur umum kos Apel Kos dengan kompor dan kulkas">
+            <img src="images/galeri/thumbs/dapur.jpg" loading="lazy" decoding="async" width="480" height="270" alt="Dapur umum kos Apel Kos dengan kompor dan kulkas">
+            <span class="zoom" aria-hidden="true">&#128269;</span>
+          </button>
+          <figcaption class="cap">
+            <b>Dapur Umum</b>
+            <small>Kompor, kulkas, dan meja makan dipakai bersama penghuni.</small>
+          </figcaption>
+        </figure>
+
+        <figure class="gal-item">
+          <button type="button" class="gal-btn"
+                  data-full="images/galeri/kontrakanteras-web.jpg"
+                  data-alt="Teras dan ruang santai kos Apel Kos">
+            <img src="images/galeri/thumbs/kontrakanteras.jpg" loading="lazy" decoding="async" width="480" height="270" alt="Teras dan ruang santai kos Apel Kos">
+            <span class="zoom" aria-hidden="true">&#128269;</span>
+          </button>
+          <figcaption class="cap">
+            <b>Teras &amp; Ruang Santai</b>
+            <small>Tempat berkumpul, makan, dan beristirahat di luar kamar.</small>
+          </figcaption>
+        </figure>
+
+        <figure class="gal-item">
+          <button type="button" class="gal-btn"
+                  data-full="images/galeri/garasibawah-web.jpg"
+                  data-alt="Area parkir motor di bawah kos Apel Kos">
+            <img src="images/galeri/thumbs/garasibawah.jpg" loading="lazy" decoding="async" width="480" height="270" alt="Area parkir motor di bawah kos Apel Kos">
+            <span class="zoom" aria-hidden="true">&#128269;</span>
+          </button>
+          <figcaption class="cap">
+            <b>Area Parkir &amp; Bawah Kos</b>
+            <small>Parkir motor dan area bawah yang aman untuk motor penghuni.</small>
+          </figcaption>
+        </figure>
       </div>
     </div>
   </div>
@@ -813,7 +1049,10 @@
 <div class="lb" id="lb">
   <button class="close" id="lbClose" aria-label="Tutup">&times;</button>
   <button class="nav-lb prev-lb" id="lbPrev" aria-label="Sebelumnya">&#8249;</button>
-  <img id="lbImg" src="" alt="Galeri Apel Kos">
+  <figure>
+    <img id="lbImg" src="" alt="Galeri Apel Kos">
+    <figcaption class="cap-lb" id="lbCap"></figcaption>
+  </figure>
   <button class="nav-lb next-lb" id="lbNext" aria-label="Berikutnya">&#8250;</button>
 </div>
 
@@ -839,7 +1078,7 @@
 
       <details>
         <summary>Apakah ada wifi gratis dan dapur umum?</summary>
-        <p>Ada. Semua penghuni getting wifi gratis tanpa iuran, serta dapur umum yang dilengkapi kompor, kulkas, dan area makan untuk dipakai bersama.</p>
+        <p>Ada. Semua penghuni mendapatkan wifi gratis tanpa iuran, serta dapur umum yang dilengkapi kompor, kulkas, dan area makan untuk dipakai bersama.</p>
       </details>
 
       <details>
@@ -962,236 +1201,472 @@ var WA_MESSAGE = "Halo Apel Kos, saya mau tanya ketersediaan kamar. Apakah masih
   });
 
   // ===== FOTO 360 DERAJAT (support .insp Insta360) =====
-  // Daftar foto 360. Ganti isi array ini sesuai file Anda.
-  // Format src:
-  //   .insp / .jpg / .jpeg / .png  -> foto panorama (rasio 2:1)
-  //   .mp4  / .webm                -> video 360 (rasio 2:1)
-  // type "insp" opsional, hanya untuk menandai file Insta360.
+  // =========================================================
+  // FOTO 360 DERAJAT
+  // Bola WebGL asli: seret = memutar 360, scroll = zoom.
+  // Foto disimpan sendiri di folder images/360/ (tanpa layanan pihak
+  // ketiga, tanpa watermark, tanpa iframe).
+  //
+  // src yang didukung:
+  //   .jpg .jpeg .png .webp   foto panorama equirectangular (WAJIB rasio 2:1)
+  //   .mp4 .webm .mov         video 360
+  //   URL tanpa ekstensi      iframe viewer hosted (mis. panoee.live)
+  // =========================================================
+  // long = arah pandang awal, dalam DERAJAT seperti kompas di foto:
+  //        0   = tengah foto
+  //        90  = ke kanan
+  //        180 = ke belakang
+  //        270 / -90 = ke kiri
+  // lat  = kemiringan pandang awal, 0 = horizon di tengah layar
+  // zoom = tingkat zoom awal (0 paling jauh, 100 paling dekat)
   var PANO_360 = [
-    // A. Foto panorama sendiri (self-hosted, tanpa watermark)
-    // { src: "images/360/1.insp", label: "Kamar 1", type: "insp" },
-    // { src: "images/360/2.jpg",  label: "Kamar 2" },
-
-    // B. Panoee.live / penyedia hosting lain -> viewer WebGL asli (iframe).
-    //    Ambil kode embed dari tombol Share di studio.panoee.com,
-    //    lalu tempel URL iframe-nya di sini.
-    // { src: "https://panoee.live/360/panorama-1790567174870",
-    //   label: "Kamar 360", type: "iframe" },
-
-    // C. Video 360 (rasio 2:1, hasil export Insta360 Studio)
-    // { src: "images/360/3.mp4", label: "Tur 360" }
+    {
+      src: "images/360/depan-web.jpg", thumb: "images/360/thumbs/depan.jpg",
+      label: "Tampak Depan", icon: "🏢",
+      desc: "Tampak depan Apel Kos beserta pagar, tanaman, dan area parkir motor.",
+      long: 0, lat: 0, zoom: 50
+    },
+    {
+      src: "images/360/kontrakankamar1-web.jpg", thumb: "images/360/thumbs/kontrakankamar1.jpg",
+      label: "Kamar Tidur", icon: "🛏️",
+      desc: "Isi kamar: spring bed, lemari baju, AC, meja kerja, dan kamar mandi dalam.",
+      long: 0, lat: -5, zoom: 50
+    },
+    {
+      src: "images/360/kontrakandapur-web.jpg", thumb: "images/360/thumbs/kontrakandapur.jpg",
+      label: "Dapur Umum", icon: "🍳",
+      desc: "Dapur bersama dengan kompor, kulkas, dan area makan untuk semua penghuni.",
+      long: 0, lat: -5, zoom: 50
+    },
+    {
+      src: "images/360/kontrakanteras-web.jpg", thumb: "images/360/thumbs/kontrakanteras.jpg",
+      label: "Teras & Ruang Santai", icon: "🪑",
+      desc: "Area teras untuk santai, ngobrol, dan berjemur di sore hari.",
+      long: 0, lat: -5, zoom: 50
+    },
+    {
+      src: "images/360/teraskosjpg-web.jpg", thumb: "images/360/thumbs/teraskosjpg.jpg",
+      label: "Teras Atas Kos", icon: "🏡",
+      desc: "Pemandangan dari teras atas, terlihat kondisi atap dan lingkungan sekitar.",
+      long: 0, lat: -5, zoom: 50
+    },
+    {
+      src: "images/360/tandonjemuranjpg-web.jpg", thumb: "images/360/thumbs/tandonjemuranjpg.jpg",
+      label: "Area Jemuran", icon: "🧺",
+      desc: "Area jemuran laundry dan tempat menyimpan barang di area belakang kos.",
+      long: 0, lat: -5, zoom: 50
+    }
   ];
 
-  // ZOOM: 1 = panorama pas-lebar (tidak bisa berputar).
-  // 2 = lebar gambar 2x viewport, jadi 1 layar drag = sekitar 180 derajat.
-  // Naikkan ke 3 atau 4 kalau ingin zoom lebih dekat.
-  var ZOOM = 2;
+  // Pustaka WebGL, disimpan lokal di folder vendor/ supaya tidak
+  // bergantung pada CDN pihak ketiga.
+  var VENDOR = [
+    "vendor/three.min.js",
+    "vendor/uevent.min.js",
+    "vendor/photo-sphere-viewer.min.js"
+  ];
 
-  var pano   = document.getElementById("pano");
-  var listEl = document.getElementById("panoList");
-  var emptyEl= document.getElementById("panoEmpty");
-  var badgeEl= document.getElementById("panoBadge");
-  var hintEl = document.getElementById("panoHint");
-  var ctlEl  = document.getElementById("panoCtl");
-  var strip = null, video = null, frame = null, errBox = null;
-  var pan = 0, dragging = false, sx = 0, sp = 0, cur = -1;
+  var pano    = document.getElementById("pano");
+  var listEl  = document.getElementById("panoList");
+  var emptyEl = document.getElementById("panoEmpty");
+  var badgeEl = document.getElementById("panoBadge");
+  var hintEl  = document.getElementById("panoHint");
+  var barEl   = document.getElementById("panoBar");
+  var errEl   = document.getElementById("panoErr");
+  var lvlEl   = document.getElementById("pZoomLvl");
+  var headEl  = document.getElementById("panoHead");
 
-  var IMG_RE  = /\.(insp|jpe?g|png|webp)(\?|#|$)/i;
-  var VID_RE  = /\.(mp4|webm|mov)(\?|#|$)/i;
+  var viewer = null, libPromise = null, cur = -1, curItem = null;
+  var infoEl = document.getElementById("panoInfo");
+  var nameEl = document.getElementById("panoName");
+  var descEl = document.getElementById("panoDesc");
+
+  function showInfo(item){
+    if(!infoEl) return;
+    if(!item || !item.label){ infoEl.hidden = true; return; }
+    nameEl.textContent = (item.icon ? item.icon + " " : "") + item.label;
+    descEl.textContent = item.desc || "";
+    infoEl.hidden = false;
+  }
+
+  // Uji terhadap geometri bola three.js+PSV:
+  //   PSV longitude 0   menampilkan image 90 derajat
+  //   PSV longitude 90  menampilkan image 0 derajat
+  // jadi untuk menampilkan arah foto H, PSV memakai (90 - H).
+  function startPos(item){
+    var lon = (90 - (Number(item.long) || 0)) * Math.PI / 180;
+    var lat = (Number(item.lat)  || 0) * Math.PI / 180;
+    return { longitude: lon, latitude: lat };
+  }
+  function startZoom(item){
+    var z = Number(item.zoom);
+    return isNaN(z) ? 50 : Math.max(0, Math.min(100, z));
+  }
+
+  var VID_RE    = /\.(mp4|webm|mov)(\?|#|$)/i;
+  var IMG_RE    = /\.(insp|jpe?g|png|webp)(\?|#|$)/i;
   var IFRAME_RE = /^(https?:)?\/\//i;
 
   function kind(item){
-    // Mutlakkan src supaya URL absolut/relatif sama-sama bisa dicek.
     var u = (item.src || "").trim();
-    var hasExt = IMG_RE.test(u) || VID_RE.test(u);
-    // iframe hanya kalau diminta eksplisit, atau URL absolut yang
-    // BUKAN file gambar/video (mis. https://panoee.live/360/panorama-123)
     if(item.type === "iframe") return "iframe";
-    if(IFRAME_RE.test(u) && !hasExt) return "iframe";
-    if(item.type === "insp") return "insp";
-    if(VID_RE.test(u))  return "video";
-    if(IMG_RE.test(u))  return "image";
+    if(IFRAME_RE.test(u) && !IMG_RE.test(u) && !VID_RE.test(u)) return "iframe";
+    if(VID_RE.test(u)) return "video";
     return "image";
   }
 
-  function clampPx(v){
-    return Math.max(0, Math.min(maxPan(), v));
-  }
-  function maxPan(){
-    return strip ? Math.max(0, strip.offsetWidth - pano.clientWidth) : 0;
-  }
-  function paint(){
-    if(strip) strip.style.transform = "translateX(" + (-pan) + "px) translateY(-50%)";
-  }
-  function fit(){
-    if(!strip || !strip.naturalWidth) return;
-    var nw = strip.naturalWidth, nh = strip.naturalHeight;
-    var scale = Math.max(pano.clientWidth / nw, pano.clientHeight / nh) * ZOOM;
-    strip.style.width  = Math.round(nw * scale) + "px";
-    strip.style.height = Math.round(nh * scale) + "px";
-    pan = clampPx(pan);
-    paint();
-  }
-  function nudge(d){ pan = clampPx(pan + d); paint(); }
-  function resetPan(){ pan = 0; paint(); }
-
-  function down(x){ dragging = true; sx = x; sp = pan; pano.classList.add("drag"); }
-  function move(x){
-    if(!dragging || !strip) return;
-    pan = clampPx(sp - (x - sx));   // geser kanan -> lihat sisi kiri foto
-    paint();
-  }
-  function up(){ dragging = false; pano.classList.remove("drag"); }
-
-  function clearStage(){
-    if(strip){ strip.remove(); strip = null; }
-    if(video){ video.remove(); video = null; }
-    if(frame){ frame.remove(); frame = null; }
-    if(errBox){ errBox.remove(); errBox = null; }
-    pan = 0;
+  // ---------- muat pustaka WebGL sekali saja, saat dibutuhkan ----------
+  function loadLib(){
+    if(window.PhotoSphereViewer) return Promise.resolve();
+    if(libPromise) return libPromise;
+    libPromise = new Promise(function(resolve, reject){
+      var i = 0;
+      (function next(){
+        if(i >= VENDOR.length){ resolve(); return; }
+        var f = VENDOR[i++], s = document.createElement("script");
+        s.src = f;
+        s.onload  = function(){ next(); };
+        s.onerror = function(){ reject(new Error("Gagal memuat " + f)); };
+        document.head.appendChild(s);
+      })();
+    });
+    return libPromise;
   }
 
-  function showError(item, why){
-    clearStage();
-    errBox = document.createElement("div");
-    errBox.className = "err on";
-    var hintMsg = kind(item) === "insp"
-      ? "File .insp gagal dibuka. Penyebab paling umum: server tidak mengirim tipe MIME image/jpeg untuk ekstensi .insp. Solusi paling mudah: salin/rename file .insp menjadi .jpg (isi file tidak berubah sama sekali), lalu pakai nama .jpg di PANO_360."
-      : "Gagal memuat file. Pastikan file ada di folder images/360/ dan nama huruf besarnya sama persis.";
-    errBox.innerHTML =
-      '<div><b>Tidak bisa membuka ' + (item.src.split("/").pop()) + '</b>' +
-      '<small>' + why + ' ' + hintMsg + '</small></div>';
-    pano.appendChild(errBox);
-    badgeEl.textContent = "Error";
-    hintEl.style.display = "none";
-    ctlEl.style.display = "none";
+  // ---------- tampilan pesan ----------
+  function fail(html){
+    errEl.className = "err on";
+    errEl.innerHTML = html;
+    barEl.style.display = "none";
+    hideHint();
+  }
+  function clearFail(){
+    errEl.className = "err";
+    errEl.innerHTML = "";
   }
 
+  var hintTimer = null;
+  function hideHint(){
+    if(hintEl) hintEl.style.opacity = "0";
+    clearTimeout(hintTimer);
+  }
+  function showHint(msg, keep){
+    if(!hintEl) return;
+    if(msg) hintEl.textContent = msg;
+    hintEl.style.opacity = "1";
+    clearTimeout(hintTimer);
+    if(!keep) hintTimer = setTimeout(hideHint, 3600);
+  }
+
+  // ---------- video & iframe (tanpa bola WebGL) ----------
+  function stopViewer(){
+    if(viewer){ viewer.destroy(); viewer = null; }
+    ["pSpin","pFs"].forEach(function(id){
+      var el = document.getElementById(id);
+      el.style.background = ""; el.style.color = ""; el.style.borderColor = "";
+    });
+    lvlEl.textContent = "50%";
+  }
+  function mountVideo(item){
+    stopViewer();
+    var v = document.createElement("video");
+    v.src = item.src; v.controls = true; v.playsInline = true;
+    v.setAttribute("playsinline","");
+    v.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;z-index:1";
+    v.addEventListener("error", function(){
+      fail("<div><b>Video gagal dimuat</b><small>Periksa nama file di <code>images/360/</code>.</small></div>");
+    });
+    pano.appendChild(v);
+    badgeEl.textContent = "Video 360";
+    showHint("Putar video. Tampilan datar, bukan panorama 360 penuh.");
+  }
+  function mountIframe(item){
+    stopViewer();
+    var f = document.createElement("iframe");
+    f.src = item.src;
+    f.title = item.label || "Foto 360 Apel Kos";
+    f.setAttribute("allow","accelerometer; gyroscope; fullscreen; xr-spatial-tracking");
+    f.setAttribute("allowfullscreen","");
+    f.setAttribute("referrerpolicy","no-referrer-when-downgrade");
+    f.style.cssText = "position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff;z-index:1";
+    pano.appendChild(f);
+    badgeEl.textContent = "apelkos Hosted";
+    showHint("Viewer dari penyedia hosting. Kontrol ada di dalam viewer.");
+  }
+
+  // ---------- WebGL tidak tersedia: tetap tampilkan fotonya ----------
+  // Halaman tidak boleh jadi buntu. Foto ditampilkan penuh sebagai
+  // gambar biasa, plus alasan kenapa mode 360 tidak bisa jalan.
+  function noWebGL(item, why){
+    stopViewer();
+    var PSV = window.PhotoSphereViewer;
+    var det = PSV && PSV.SYSTEM
+      ? ("WebGL: " + (PSV.SYSTEM.isWebGLSupported ? "ada" : "tidak") +
+         " \u00b7 Batas texture: " + (PSV.SYSTEM.maxTextureWidth || "tidak terbaca"))
+      : "Pustaka viewer belum termuat";
+
+    var im = document.createElement("img");
+    im.src = item.src;
+    im.alt = item.label || "Foto Apel Kos";
+    im.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:1;background:#111";
+    pano.appendChild(im);
+
+    errEl.className = "nogl on";
+    errEl.innerHTML =
+      '<b>Mode putar 360 tidak aktif di perangkat ini</b>' +
+      '<small>Foto di atas tetap bisa dilihat. Untuk memutar 360, buka di browser lain ' +
+      'atau aktifkan akselerasi grafis. (' + det + ')' +
+      (why ? ' Pesan: ' + why : '') + '</small>' +
+      '<a href="' + item.src + '" target="_blank" rel="noopener">Buka foto ukuran penuh</a>';
+    barEl.style.display = "none";
+    hideHint();
+    badgeEl.textContent = "Foto 360";
+  }
+
+  // ---------- bola 360 ----------
+  function mountSphere(item, index){
+    clearFail();
+    barEl.style.display = "";
+    badgeEl.textContent = "";
+    showHint("Seret untuk memutar &mdash; scroll atau tombol untuk zoom");
+
+    function build(){
+      if(!window.PhotoSphereViewer) return;
+      var PSV = window.PhotoSphereViewer;
+
+      // PENTING: isWebGLSupported bernilai false sampai SYSTEM.load()
+      // dipanggil. Kalau dicek sebelum itu, selalu muncul pesan "tidak
+      // mendukung WebGL" padahal perangkatnya sebenarnya mendukung.
+      try{
+        if(PSV.SYSTEM.load) PSV.SYSTEM.load();
+      } catch(e){ /* lanjut, constructor yang akan memutuskan */ }
+      if(PSV.SYSTEM.isWebGLSupported === false){
+        noWebGL(item);
+        return;
+      }
+
+      stopViewer();
+      try{
+        viewer = new PSV.Viewer({
+          container: pano,
+          panorama: item.src,
+          caption: item.label || "360",
+          // 100 = paling dekat, 0 = paling jauh
+          defaultZoomLvl: 50,
+          minFov: 28,          // zoom in terdekat
+          maxFov: 105,         // zoom out terjauh
+          moveSpeed: 1.3,      // kecepatan putar saat seret
+          zoomSpeed: 1.3,      // kecepatan zoom
+          mousewheel: true,    // scroll = zoom langsung
+          mousewheelCtrlKey: false,
+          touchmoveTwoFingers: true,  // 1 jari putar, 2 jari zoom
+          moveInertia: true,
+          useXmpData: true,    // pakai data Insta360 dari EXIF foto
+          canvasBackground: "#000",
+          keyboard: "always",
+          navbar: ["zoomOut","zoomIn","zoomRange","autorotate","fullscreen"],
+          lang: {
+            zoom:"Zoom", zoomOut:"Perkecil", zoomIn:"Perbesar",
+            autorotate:"Putar otomatis", fullscreen:"Layar penuh",
+            move:"Geser", ctrlZoom:"Zoom", twoFingers:"2 jari untuk zoom"
+          }
+        });
+      } catch(err){
+        viewer = null;
+        if(/WebGL|system capabilities/i.test((err && err.message) || "")){
+          noWebGL(item, (err && err.message) || "");
+        } else {
+          fail("<div><b>Viewer 360 gagal berjalan</b><small>" +
+               (err && err.message ? err.message : "Kesalahan tidak diketahui") + "</small>" +
+               '<a href="' + item.src + '" target="_blank" rel="noopener">Buka foto langsung</a></div>');
+        }
+        return;
+      }
+
+      viewer.on("ready", function(){
+        pano.tabIndex = 0;
+        updateZoom();
+        hideHint();
+      });
+      viewer.on("zoom-updated", updateZoom);
+      viewer.on("position-updated", updateHead);
+      viewer.on("panorama-loaded", function(){
+        badgeEl.textContent = "Seret untuk memutar";
+        // FACE AWAL: ikut setting long/lat/zoom di PANO_360
+        var pos = startPos(item);
+        viewer.rotate(pos);
+        viewer.zoom(startZoom(item));
+        updateHead();
+      });
+      viewer.on("fullscreen-updated", updateFs);
+      viewer.on("autorotate", updateSpin);
+    }
+
+    if(window.PhotoSphereViewer){ build(); return; }
+
+    showHint("Memuat penampil 360\u2026", true);
+    loadLib().then(build).catch(function(err){
+      fail("<div><b>Pustaka viewer gagal dimuat</b><small>" + err.message +
+           ". Pastikan folder <code>vendor/</code> ikut terunggah.</small></div>");
+    });
+  }
+
+  function updateZoom(){
+    if(!viewer) return;
+    lvlEl.textContent = Math.round(viewer.getZoomLevel()) + "%";
+  }
+  // kompas: tampilkan arah pandang saat ini dalam derajat foto
+  function updateHead(){
+    var el = document.getElementById("panoHead");
+    if(!viewer || !el) return;
+    var deg = 90 - (viewer.getPosition().longitude * 180 / Math.PI);
+    deg = ((deg % 360) + 360) % 360;
+    el.textContent = Math.round(deg) + "\u00b0";
+  }
+  function updateSpin(){
+    var el = document.getElementById("pSpin");
+    if(!viewer) return;
+    var on = viewer.isAutorotateEnabled();
+    el.style.background = on ? "var(--green)" : "";
+    el.style.color      = on ? "#fff" : "";
+    el.style.borderColor= on ? "var(--green)" : "";
+  }
+  function updateFs(){
+    var on = viewer && viewer.isFullscreenEnabled();
+    var el = document.getElementById("pFs");
+    el.innerHTML = on ? "&#9976; Keluar" : "&#9974; Layar Penuh";
+  }
+
+  // ---------- memuat satu item ----------
   function load(i){
     if(!PANO_360.length) return;
     cur = (i + PANO_360.length) % PANO_360.length;
     var item = PANO_360[cur];
+    curItem = item;
     var k = kind(item);
+    showInfo(item);
 
-    clearStage();
-    emptyEl.style.display = "none";
-    badgeEl.textContent = k === "insp" ? "360&deg; INSP" : "360&deg;";
-    hintEl.style.display = "";
-    ctlEl.style.display = PANO_360.length > 1 ? "" : "none";
-
-    // aktifkan tombol Navigasi foto
-    [].forEach.call(listEl.children, function(b, idx){
-      b.classList.toggle("on", idx === cur);
+    // bersihkan isi sebelumnya
+    var keep = [emptyEl, badgeEl, hintEl, errEl, headEl];
+    Array.prototype.slice.call(pano.children).forEach(function(el){
+      if(keep.indexOf(el) === -1) el.remove();
     });
+    if(!viewer) clearFail();
 
-    if(k === "iframe"){
-      badgeEl.textContent = "360&deg; Hosted";
-      hintEl.textContent = "Viewer 360 dari penyedia hosting (iframe).";
-      frame = document.createElement("iframe");
-      frame.src = item.src;
-      frame.title = item.label || "Foto 360 Apel Kos";
-      frame.setAttribute("allow", "accelerometer; gyroscope; fullscreen; xr-spatial-tracking");
-      frame.setAttribute("allowfullscreen", "");
-      frame.setAttribute("loading", "lazy");
-      frame.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
-      pano.appendChild(frame);
-      ctlEl.style.display = "none";   // iframe punya kontrol sendiri
-      return;
-    }
+    Array.prototype.forEach.call(listEl.children, function(btn, idx){
+      btn.classList.toggle("on", idx === cur);
+    });
+    var multi = PANO_360.length > 1;
+    ["grpNav","sep1"].forEach(function(id){ document.getElementById(id).hidden = !multi; });
 
-    if(k === "video"){
-      badgeEl.textContent = "Video 360";
-      hintEl.textContent = "Putar video. Tampilan datar, bukan panorama 360 penuh.";
-      video = document.createElement("video");
-      video.src = item.src;
-      video.controls = true;
-      video.playsInline = true;
-      video.setAttribute("playsinline", "");
-      video.addEventListener("error", function(){ showError(item, "Browser gagal memutar video ini."); });
-      pano.appendChild(video);
-      return;
-    }
-
-    strip = document.createElement("img");
-    strip.className = "strip";
-    strip.alt = item.label || "Foto 360 Apel Kos";
-    strip.setAttribute("draggable", "false");
-    strip.addEventListener("load", function(){ fit(); resetPan(); });
-    strip.addEventListener("error", function(){ showError(item, ""); });
-    strip.src = item.src;
-    pano.appendChild(strip);
+    if(k === "iframe"){ mountIframe(item); return; }
+    if(k === "video"){ mountVideo(item); return; }
+    mountSphere(item, cur);
   }
 
-  // Bangun tombol pemilih bila ada daftar
+  // ---------- tombol kontrol ----------
+  function withViewer(fn){
+    return function(){
+      if(!viewer) return;
+      hideHint();
+      fn(viewer);
+    };
+  }
+  document.getElementById("pZoomIn").addEventListener("click",  withViewer(function(v){ v.zoomIn(1); }));
+  document.getElementById("pZoomOut").addEventListener("click", withViewer(function(v){ v.zoomOut(1); }));
+  document.getElementById("pFs").addEventListener("click",      withViewer(function(v){ v.toggleFullscreen(); }));
+  document.getElementById("pSpin").addEventListener("click",     withViewer(function(v){
+    v.toggleAutorotate();
+  }));
+  document.getElementById("pReset").addEventListener("click",    withViewer(function(v){
+    v.animate(startPos(curItem || {}), 350);
+    v.zoom(startZoom(curItem || {}));
+  }));
+  document.getElementById("pPrev").addEventListener("click", function(){ if(PANO_360.length > 1) load(cur - 1); });
+  document.getElementById("pNext").addEventListener("click", function(){ if(PANO_360.length > 1) load(cur + 1); });
+
+  // ---------- daftar foto ----------
   if(PANO_360.length){
     emptyEl.style.display = "none";
     listEl.hidden = false;
     PANO_360.forEach(function(item, i){
       var b = document.createElement("button");
       b.type = "button";
-      b.textContent = item.label || ("360 " + (i + 1));
+      b.setAttribute("aria-label", "Lihat 360: " + (item.label || ("foto " + (i + 1))));
+
+      var v = document.createElement("span");
+      v.className = "pv";
+      if(item.thumb){
+        var im = document.createElement("img");
+        im.src = item.thumb;
+        im.alt = "Thumbnail 360 " + (item.label || "");
+        im.loading = "lazy";
+        im.decoding = "async";
+        im.width = 480; im.height = 270;
+        v.appendChild(im);
+      }
+      var tg = document.createElement("span");
+      tg.className = "tag360";
+      tg.textContent = "360\u00b0";
+      v.appendChild(tg);
+
+      var t = document.createElement("span");
+      t.className = "pt";
+      t.textContent = (item.icon ? item.icon + " " : "") + (item.label || ("360 " + (i + 1)));
+
+      b.appendChild(v);
+      b.appendChild(t);
       b.addEventListener("click", function(){ load(i); });
       listEl.appendChild(b);
     });
     load(0);
   } else {
-    ctlEl.style.display = "none";
+    barEl.style.display = "none";
   }
 
-  pano.addEventListener("mousedown", function(e){ if(strip) down(e.clientX); e.preventDefault(); });
-  window.addEventListener("mousemove", function(e){ move(e.clientX); });
-  window.addEventListener("mouseup", up);
-  pano.addEventListener("touchstart", function(e){ if(strip) down(e.touches[0].clientX); }, {passive:true});
-  pano.addEventListener("touchmove",  function(e){ if(strip) move(e.touches[0].clientX); }, {passive:true});
-  pano.addEventListener("touchend",   up);
-  window.addEventListener("resize", function(){
-    if(strip) fit();
-  });
-
-  document.getElementById("pLeft").addEventListener("click",  function(){ nudge(-pano.clientWidth * 0.25); });
-  document.getElementById("pRight").addEventListener("click", function(){ nudge( pano.clientWidth * 0.25); });
-  document.getElementById("pReset").addEventListener("click", resetPan);
-  document.getElementById("pPrev").addEventListener("click",  function(){ if(PANO_360.length > 1) load(cur - 1); });
-  document.getElementById("pNext").addEventListener("click",  function(){ if(PANO_360.length > 1) load(cur + 1); });
-
-  document.addEventListener("keydown", function(e){
-    if(document.getElementById("lb").classList.contains("on")){
-      if(e.key === "Escape") closeLb();
-      if(e.key === "ArrowLeft")  stepLb(-1);
-      if(e.key === "ArrowRight") stepLb(1);
-    }
-  });
+  // viewer perlu ukuran ulang saat tabnya jadi terlihat
+  window.addEventListener("resize", function(){ if(viewer) viewer.resize(); });
 
   // ===== LIGHTBOX (klik foto untuk perbesar) =====
-  var lb = document.getElementById("lb"),
+  var lb    = document.getElementById("lb"),
       lbImg = document.getElementById("lbImg"),
-      items = [].slice.call(document.querySelectorAll("#galGrid .gal-item")),
-      cur = 0, photos = [];
+      lbCap = document.getElementById("lbCap"),
+      btns  = [].slice.call(document.querySelectorAll("#galGrid .gal-btn")),
+      lbCur = 0;
 
-  items.forEach(function(it){
-    var img = it.querySelector("img");
-    if(img) photos.push({ src: img.getAttribute("src"), alt: img.getAttribute("alt") || "" });
-  });
+  var photos = btns.map(function(btn){
+    var fig = btn.closest(".gal-item"),
+        cap = fig ? fig.querySelector(".cap") : null;
+    return {
+      src:  btn.getAttribute("data-full") || "",
+      alt:  btn.getAttribute("data-alt") || "",
+      cap:  cap ? cap.querySelector("b") : null,
+      note: cap ? cap.querySelector("small") : null
+    };
+  }).filter(function(p){ return p.src; });
 
-  function show(i){
-    if(!photos.length) return;           // belum ada foto -> abaikan
-    cur = (i + photos.length) % photos.length;
-    lbImg.src = photos[cur].src;
-    lbImg.alt = photos[cur].alt;
+  function showLb(i){
+    if(!photos.length) return;
+    lbCur = (i + photos.length) % photos.length;
+    var p = photos[lbCur];
+    lbImg.src = p.src;
+    lbImg.alt = p.alt;
+    lbCap.textContent = (p.cap ? p.cap.textContent : p.alt) + (p.note ? " \u2014 " + p.note.textContent : "");
     lb.classList.add("on");
     document.body.style.overflow = "hidden";
   }
-  function stepLb(d){ show(cur + d); }
+  function stepLb(d){ showLb(lbCur + d); }
   function closeLb(){ lb.classList.remove("on"); document.body.style.overflow = ""; }
 
-  items.forEach(function(it, i){
-    it.addEventListener("click", function(){
-      if(!photos.length) return;
-      // cari index foto yang diklik
-      var img = it.querySelector("img");
-      var idx = img ? photos.findIndex(function(p){ return p.src === img.getAttribute("src"); }) : -1;
-      show(idx < 0 ? 0 : idx);
-    });
+  btns.forEach(function(btn, i){
+    btn.addEventListener("click", function(){ showLb(i); });
+  });
+
+  document.addEventListener("keydown", function(e){
+    if(!lb.classList.contains("on")) return;
+    if(e.key === "Escape") closeLb();
+    if(e.key === "ArrowLeft")  stepLb(-1);
+    if(e.key === "ArrowRight") stepLb(1);
   });
 
   document.getElementById("lbClose").addEventListener("click", closeLb);

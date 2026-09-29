@@ -1,0 +1,17 @@
+.DS_Store
+Thumbs.db
+
+# ===== file master/asli: TIDAK ikut ter-deploy =====
+# Yang dipakai website hanya versi -web.jpg dan thumbs/.
+# File asli (12 MB per panorama) disimpan di komputer saja.
+images/360/*.insp
+images/360/*.jpg
+images/galeri/*.jpg
+!images/360/*-web.jpg
+!images/galeri/*-web.jpg
+!images/360/thumbs/*.jpg
+!images/galeri/thumbs/*.jpg
+
+# cache tools
+__pycache__/
+*.pyc
